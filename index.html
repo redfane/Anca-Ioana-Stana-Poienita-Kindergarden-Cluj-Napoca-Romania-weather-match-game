@@ -1,0 +1,1626 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww34360\viewh18520\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!doctype html>\
+<html lang="en">\
+<head>\
+  <meta charset="utf-8" />\
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />\
+  <title>Weather Match Adventure (Offline)</title>\
+  <style>\
+    :root\{\
+      --bg1:#f7fbff;\
+      --bg2:#fff7fb;\
+      --card:#ffffff;\
+      --ink:#1c2a39;\
+      --muted:#5c6b7a;\
+      --accent:#2b7cff;\
+      --good:#2dbf6c;\
+      --warn:#ffb020;\
+      --bad:#ff4d4d;\
+      --shadow: 0 10px 24px rgba(0,0,0,0.10);\
+      --radius: 18px;\
+      --tap: 76px;\
+      --focus: 0 0 0 4px rgba(43,124,255,0.25);\
+      --font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";\
+    \}\
+    *\{box-sizing:border-box\}\
+    body\{\
+      margin:0;\
+      font-family: var(--font);\
+      color:var(--ink);\
+      background: radial-gradient(1200px 600px at 10% 10%, var(--bg2), transparent 60%),\
+                  radial-gradient(1000px 600px at 90% 20%, var(--bg1), transparent 60%),\
+                  linear-gradient(180deg, #ffffff, #f2f7ff);\
+      min-height:100vh;\
+      display:flex;\
+      justify-content:center;\
+      align-items:flex-start;\
+      padding: 16px;\
+    \}\
+    .app\{\
+      width:min(980px, 100%);\
+      background: rgba(255,255,255,0.75);\
+      border: 1px solid rgba(0,0,0,0.06);\
+      border-radius: 24px;\
+      box-shadow: var(--shadow);\
+      overflow:hidden;\
+      position:relative;\
+    \}\
+    header\{\
+      padding: 14px 16px;\
+      display:flex;\
+      align-items:center;\
+      gap:12px;\
+      background: rgba(255,255,255,0.85);\
+      border-bottom: 1px solid rgba(0,0,0,0.06);\
+    \}\
+    .brand\{\
+      display:flex;\
+      align-items:center;\
+      gap:10px;\
+      flex:1;\
+      min-width: 0;\
+    \}\
+    .logo\{\
+      width:40px;height:40px;border-radius:14px;\
+      background: linear-gradient(135deg, #2b7cff, #7dd3fc);\
+      display:grid;place-items:center;\
+      color:white;font-size:20px;\
+      box-shadow: 0 8px 18px rgba(43,124,255,0.25);\
+    \}\
+    .title\{\
+      line-height:1.1;\
+      min-width:0;\
+    \}\
+    .title strong\{\
+      display:block;\
+      font-size: 16px;\
+      letter-spacing:0.2px;\
+      white-space:nowrap;\
+      overflow:hidden;\
+      text-overflow:ellipsis;\
+    \}\
+    .title span\{\
+      display:block;\
+      font-size: 12px;\
+      color: var(--muted);\
+      white-space:nowrap;\
+      overflow:hidden;\
+      text-overflow:ellipsis;\
+    \}\
+    .toolbar\{\
+      display:flex;\
+      gap:10px;\
+      align-items:center;\
+      flex-wrap:wrap;\
+      justify-content:flex-end;\
+    \}\
+    .pill\{\
+      display:inline-flex;\
+      align-items:center;\
+      gap:8px;\
+      border:1px solid rgba(0,0,0,0.08);\
+      background: #fff;\
+      border-radius:999px;\
+      padding: 8px 10px;\
+      height: 44px;\
+      box-shadow: 0 6px 14px rgba(0,0,0,0.05);\
+    \}\
+    .pill button\{\
+      border:none;\
+      background:transparent;\
+      font:inherit;\
+      cursor:pointer;\
+      height: 36px;\
+      min-width: 36px;\
+      border-radius:999px;\
+      padding: 0 10px;\
+      display:inline-flex;\
+      align-items:center;\
+      justify-content:center;\
+      gap:8px;\
+      color: var(--ink);\
+      transition: transform .06s ease, background .15s ease;\
+    \}\
+    .pill button:hover\{ background: rgba(43,124,255,0.08); \}\
+    .pill button:active\{ transform: translateY(1px); \}\
+    .pill button:focus\{ outline:none; box-shadow: var(--focus); \}\
+    .toggle\{\
+      user-select:none;\
+      display:inline-flex;\
+      align-items:center;\
+      gap:8px;\
+      padding:0 10px;\
+      height:36px;\
+      border-radius:999px;\
+      cursor:pointer;\
+    \}\
+    .switch\{\
+      width:42px;height:24px;border-radius:999px;\
+      background: rgba(0,0,0,0.12);\
+      position:relative;\
+      flex:0 0 auto;\
+      transition: background .15s ease;\
+    \}\
+    .knob\{\
+      width:18px;height:18px;border-radius:50%;\
+      background:white; position:absolute; top:3px; left:3px;\
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);\
+      transition: left .15s ease;\
+    \}\
+    .toggle.on .switch\{ background: rgba(45,191,108,0.55); \}\
+    .toggle.on .knob\{ left:21px; \}\
+    .toggle small\{ color: var(--muted); font-size: 12px; \}\
+\
+    main\{ padding: 16px; \}\
+    .screen\{ display:none; \}\
+    .screen.active\{ display:block; \}\
+\
+    .card\{\
+      background: var(--card);\
+      border: 1px solid rgba(0,0,0,0.08);\
+      border-radius: var(--radius);\
+      box-shadow: 0 10px 22px rgba(0,0,0,0.06);\
+      padding: 16px;\
+    \}\
+    .hero\{\
+      display:grid;\
+      grid-template-columns: 1.1fr 0.9fr;\
+      gap:16px;\
+      align-items:stretch;\
+    \}\
+    @media (max-width: 820px)\{\
+      .hero\{ grid-template-columns: 1fr; \}\
+      header\{ align-items:flex-start; \}\
+      .toolbar\{ justify-content:flex-start; \}\
+    \}\
+    .storyBox\{ display:flex; flex-direction:column; gap:12px; \}\
+    .bigCharacter\{\
+      display:grid;\
+      place-items:center;\
+      border-radius: var(--radius);\
+      background: linear-gradient(135deg, rgba(125,211,252,0.35), rgba(43,124,255,0.12));\
+      border: 1px solid rgba(43,124,255,0.18);\
+      min-height: 180px;\
+      padding: 12px;\
+      text-align:center;\
+    \}\
+    .charFace\{\
+      font-size: 64px;\
+      line-height:1;\
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,0.10));\
+    \}\
+    .charName\{ margin-top: 8px; font-weight:700; color:#12407a; \}\
+    .storyText\{ font-size: 16px; line-height:1.35; color: var(--ink); \}\
+    .storyText p\{ margin:0 0 10px 0; \}\
+\
+    .nameRow\{\
+      display:flex;\
+      gap:10px;\
+      flex-wrap:wrap;\
+      align-items:center;\
+      margin-top: 4px;\
+    \}\
+    .nameRow label\{\
+      font-weight:900;\
+      color: var(--ink);\
+      font-size: 14px;\
+    \}\
+    .nameInput\{\
+      flex:1;\
+      min-width: 220px;\
+      min-height: 56px;\
+      border-radius: 16px;\
+      border: 2px solid rgba(0,0,0,0.12);\
+      padding: 0 14px;\
+      font-size: 18px;\
+      font-weight: 800;\
+      outline:none;\
+    \}\
+    .nameInput:focus\{ box-shadow: var(--focus); border-color: rgba(43,124,255,0.65); \}\
+\
+    .actions\{\
+      display:flex;\
+      gap:10px;\
+      flex-wrap:wrap;\
+      margin-top: 8px;\
+    \}\
+    .primaryBtn, .secondaryBtn\{\
+      border:none;\
+      cursor:pointer;\
+      border-radius: 16px;\
+      padding: 14px 16px;\
+      min-height: var(--tap);\
+      min-width: min(240px, 100%);\
+      font-weight: 800;\
+      letter-spacing: 0.2px;\
+      font-size: 16px;\
+      display:inline-flex;\
+      align-items:center;\
+      justify-content:center;\
+      gap:10px;\
+      transition: transform .06s ease, filter .15s ease;\
+    \}\
+    .primaryBtn\{\
+      background: linear-gradient(135deg, #2b7cff, #6ee7ff);\
+      color:white;\
+      box-shadow: 0 14px 22px rgba(43,124,255,0.22);\
+    \}\
+    .secondaryBtn\{\
+      background: #ffffff;\
+      border: 1px solid rgba(0,0,0,0.10);\
+      color: var(--ink);\
+    \}\
+    .primaryBtn:hover\{ filter: brightness(1.03); \}\
+    .secondaryBtn:hover\{ background: rgba(43,124,255,0.05); \}\
+    .primaryBtn:active, .secondaryBtn:active\{ transform: translateY(1px); \}\
+    .primaryBtn:focus, .secondaryBtn:focus\{ outline:none; box-shadow: var(--focus); \}\
+\
+    .gameTop\{\
+      display:flex;\
+      gap:12px;\
+      align-items:center;\
+      flex-wrap:wrap;\
+      justify-content:space-between;\
+      margin-bottom: 12px;\
+    \}\
+    .status\{\
+      display:flex;\
+      gap:12px;\
+      align-items:center;\
+      flex-wrap:wrap;\
+    \}\
+    .badge\{\
+      display:inline-flex;\
+      align-items:center;\
+      gap:8px;\
+      padding: 10px 12px;\
+      border-radius: 999px;\
+      background:#fff;\
+      border:1px solid rgba(0,0,0,0.08);\
+      box-shadow: 0 8px 18px rgba(0,0,0,0.05);\
+      min-height: 44px;\
+      font-weight:700;\
+    \}\
+    .badge span\{ color: var(--muted); font-weight:600; \}\
+    .stars\{ font-size: 18px; letter-spacing: 1px; \}\
+    .hint\{ color: var(--muted); font-weight:600; \}\
+\
+    .board\{\
+      display:grid;\
+      grid-template-columns: 1fr 1fr;\
+      gap: 14px;\
+      margin-top: 10px;\
+    \}\
+    @media (max-width: 820px)\{\
+      .board\{ grid-template-columns: 1fr; \}\
+    \}\
+    .columnTitle\{\
+      display:flex;\
+      align-items:center;\
+      justify-content:space-between;\
+      margin-bottom: 10px;\
+      gap:10px;\
+    \}\
+    .columnTitle h2\{\
+      margin:0;\
+      font-size: 16px;\
+      color: var(--ink);\
+      letter-spacing:0.2px;\
+    \}\
+    .grid\{\
+      display:grid;\
+      grid-template-columns: repeat(2, 1fr);\
+      gap: 10px;\
+    \}\
+    @media (min-width: 900px)\{\
+      .grid\{ grid-template-columns: repeat(3, 1fr); \}\
+    \}\
+    .matchCard\{\
+      background:#fff;\
+      border: 2px solid rgba(0,0,0,0.08);\
+      border-radius: 18px;\
+      min-height: 120px;\
+      padding: 12px;\
+      display:flex;\
+      align-items:center;\
+      justify-content:center;\
+      flex-direction:column;\
+      gap:6px;\
+      cursor:pointer;\
+      user-select:none;\
+      text-align:center;\
+      box-shadow: 0 10px 18px rgba(0,0,0,0.05);\
+      transition: transform .06s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;\
+      position:relative;\
+      overflow:hidden;\
+      touch-action: manipulation;\
+    \}\
+    .matchCard:active\{ transform: translateY(1px); \}\
+    .matchCard:focus\{ outline:none; box-shadow: var(--focus); \}\
+    .emoji\{ font-size: 40px; line-height:1; \}\
+    .label\{ font-weight:1000; font-size: 14px; \}\
+    .sub\{ font-size: 12px; color: var(--muted); font-weight:800; \}\
+\
+    .weatherCard\{\
+      background: linear-gradient(135deg, rgba(43,124,255,0.10), rgba(125,211,252,0.12));\
+      border-color: rgba(43,124,255,0.20);\
+    \}\
+    .itemCard\{\
+      background: linear-gradient(135deg, rgba(45,191,108,0.08), rgba(250,204,21,0.10));\
+      border-color: rgba(45,191,108,0.20);\
+    \}\
+\
+    .selected\{\
+      border-color: rgba(43,124,255,0.85) !important;\
+      box-shadow: 0 14px 24px rgba(43,124,255,0.18);\
+      transform: translateY(-1px);\
+    \}\
+    .correct\{\
+      border-color: rgba(45,191,108,0.95) !important;\
+      box-shadow: 0 16px 24px rgba(45,191,108,0.18);\
+      background: linear-gradient(135deg, rgba(45,191,108,0.16), rgba(45,191,108,0.06));\
+    \}\
+    .wrong\{\
+      border-color: rgba(255,77,77,0.95) !important;\
+      box-shadow: 0 16px 24px rgba(255,77,77,0.15);\
+      background: linear-gradient(135deg, rgba(255,77,77,0.14), rgba(255,77,77,0.06));\
+      animation: shake 0.28s ease-in-out 1;\
+    \}\
+    @keyframes shake\{\
+      0%\{ transform: translateX(0); \}\
+      25%\{ transform: translateX(-6px); \}\
+      50%\{ transform: translateX(6px); \}\
+      75%\{ transform: translateX(-4px); \}\
+      100%\{ transform: translateX(0); \}\
+    \}\
+    .locked\{ opacity: 0.55; cursor: default; \}\
+\
+    .toast\{\
+      margin-top: 10px;\
+      padding: 12px 14px;\
+      border-radius: 16px;\
+      border: 1px solid rgba(0,0,0,0.08);\
+      background: rgba(255,255,255,0.9);\
+      color: var(--ink);\
+      display:flex;\
+      align-items:center;\
+      justify-content:space-between;\
+      gap:12px;\
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);\
+      min-height: 56px;\
+    \}\
+    .toast strong\{ font-size: 14px; \}\
+    .toast span\{ font-size: 13px; color: var(--muted); font-weight:800; \}\
+    .toast .miniBtn\{\
+      border:none;\
+      cursor:pointer;\
+      border-radius: 12px;\
+      padding: 10px 12px;\
+      min-height: 44px;\
+      background: rgba(43,124,255,0.10);\
+      font-weight: 900;\
+    \}\
+    .toast .miniBtn:hover\{ background: rgba(43,124,255,0.16); \}\
+    .toast .miniBtn:focus\{ outline:none; box-shadow: var(--focus); \}\
+\
+    /* Teacher panel */\
+    .gearBtn\{\
+      width:44px;height:44px;\
+      border-radius: 14px;\
+      border:1px solid rgba(0,0,0,0.10);\
+      background:#fff;\
+      cursor:pointer;\
+      display:grid;\
+      place-items:center;\
+      box-shadow: 0 8px 16px rgba(0,0,0,0.05);\
+      transition: transform .06s ease, background .15s ease;\
+    \}\
+    .gearBtn:hover\{ background: rgba(43,124,255,0.06); \}\
+    .gearBtn:active\{ transform: translateY(1px); \}\
+    .gearBtn:focus\{ outline:none; box-shadow: var(--focus); \}\
+\
+    .panelOverlay\{\
+      position:absolute; inset:0;\
+      background: rgba(0,0,0,0.35);\
+      display:none;\
+      align-items:flex-end;\
+      justify-content:flex-end;\
+      padding: 14px;\
+    \}\
+    .panelOverlay.show\{ display:flex; \}\
+    .panel\{\
+      width: min(520px, 100%);\
+      background:#fff;\
+      border-radius: 22px;\
+      border: 1px solid rgba(0,0,0,0.10);\
+      box-shadow: 0 18px 40px rgba(0,0,0,0.18);\
+      overflow:hidden;\
+    \}\
+    .panelHeader\{\
+      padding: 12px 14px;\
+      display:flex;\
+      align-items:center;\
+      justify-content:space-between;\
+      gap:10px;\
+      background: linear-gradient(135deg, rgba(43,124,255,0.10), rgba(125,211,252,0.12));\
+      border-bottom: 1px solid rgba(0,0,0,0.06);\
+    \}\
+    .panelHeader strong\{ font-size: 14px; \}\
+    .panelBody\{\
+      padding: 14px;\
+      max-height: 70vh;\
+      overflow:auto;\
+    \}\
+    .panelSection\{\
+      margin-bottom: 14px;\
+      padding: 12px;\
+      border-radius: 18px;\
+      border:1px solid rgba(0,0,0,0.08);\
+      background: rgba(255,255,255,0.9);\
+    \}\
+    .panelSection h3\{\
+      margin:0 0 8px 0;\
+      font-size: 13px;\
+      color: var(--ink);\
+    \}\
+    .row\{\
+      display:flex;\
+      gap:10px;\
+      flex-wrap:wrap;\
+      align-items:center;\
+    \}\
+    .radioGroup label, .checkGroup label\{\
+      display:flex;\
+      align-items:center;\
+      gap:10px;\
+      padding: 10px 12px;\
+      border-radius: 14px;\
+      border:1px solid rgba(0,0,0,0.10);\
+      cursor:pointer;\
+      min-height: 52px;\
+      background:#fff;\
+      font-weight:900;\
+      flex:1;\
+      min-width: 160px;\
+      user-select:none;\
+    \}\
+    .radioGroup input, .checkGroup input\{\
+      width:22px; height:22px;\
+      accent-color: var(--accent);\
+    \}\
+    .finePrint\{\
+      margin-top: 8px;\
+      color: var(--muted);\
+      font-size: 12px;\
+      font-weight:700;\
+      line-height:1.3;\
+    \}\
+    .panelFooter\{\
+      padding: 12px 14px;\
+      border-top: 1px solid rgba(0,0,0,0.06);\
+      display:flex;\
+      gap:10px;\
+      justify-content:flex-end;\
+      background:#fff;\
+    \}\
+    .smallBtn\{\
+      border:none;\
+      cursor:pointer;\
+      border-radius: 14px;\
+      padding: 12px 14px;\
+      min-height: 52px;\
+      font-weight: 900;\
+    \}\
+    .smallBtn.primary\{\
+      background: linear-gradient(135deg, #2b7cff, #6ee7ff);\
+      color:#fff;\
+    \}\
+    .smallBtn.secondary\{\
+      background:#fff;\
+      border:1px solid rgba(0,0,0,0.10);\
+    \}\
+    .smallBtn:focus\{ outline:none; box-shadow: var(--focus); \}\
+\
+    /* End screen */\
+    .center\{\
+      text-align:center;\
+      display:flex;\
+      flex-direction:column;\
+      gap:12px;\
+      align-items:center;\
+      justify-content:center;\
+      padding: 10px;\
+    \}\
+    .bigWin\{ font-size: 64px; line-height:1; margin-top: 4px; \}\
+    .confetti\{ font-size: 22px; letter-spacing: 4px; opacity:0.9; \}\
+  </style>\
+</head>\
+<body>\
+  <div class="app" role="application" aria-label="Weather Match Adventure">\
+\
+    <header>\
+      <div class="brand">\
+        <div class="logo" aria-hidden="true">\uc0\u9729 \u65039 </div>\
+        <div class="title">\
+          <strong id="appTitle">Weather Match Adventure</strong>\
+          <span id="appSubtitle">Offline \'95 Big buttons \'95 Ages 5\'966</span>\
+        </div>\
+      </div>\
+\
+      <div class="toolbar">\
+        <div class="pill" title="Sound">\
+          <div id="soundToggle" class="toggle" role="switch" aria-checked="true" tabindex="0">\
+            <div class="switch" aria-hidden="true"><div class="knob"></div></div>\
+            <div>\
+              <div style="font-weight:900;font-size:13px" id="soundLabel">Sound</div>\
+              <small id="soundState">On</small>\
+            </div>\
+          </div>\
+        </div>\
+\
+        <div class="pill" title="Read story aloud">\
+          <div id="ttsToggle" class="toggle" role="switch" aria-checked="false" tabindex="0">\
+            <div class="switch" aria-hidden="true"><div class="knob"></div></div>\
+            <div>\
+              <div style="font-weight:900;font-size:13px" id="ttsLabel">Read</div>\
+              <small id="ttsState">Off</small>\
+            </div>\
+          </div>\
+        </div>\
+\
+        <button class="gearBtn" id="gearBtn" aria-label="Teacher settings" title="Teacher settings">\uc0\u9881 \u65039 </button>\
+      </div>\
+    </header>\
+\
+    <main>\
+      <!-- START SCREEN -->\
+      <section id="startScreen" class="screen active">\
+        <div class="hero">\
+          <div class="card storyBox">\
+            <div class="storyText" id="storyText"></div>\
+\
+            <div class="nameRow" aria-label="Player name">\
+              <label for="playerNameInput" id="nameLabel">Name:</label>\
+              <input id="playerNameInput" class="nameInput" type="text" maxlength="18" inputmode="text"\
+                     autocomplete="off" placeholder="Alex" />\
+            </div>\
+            <div class="finePrint" id="nameNote">Optional. Teacher can type the child\'92s name.</div>\
+\
+            <div class="actions">\
+              <button class="primaryBtn" id="startBtn">\uc0\u9654 \u65039  Start</button>\
+              <button class="secondaryBtn" id="howBtn">\uc0\u10067  How to play</button>\
+              <button class="secondaryBtn" id="readStoryBtn">\uc0\u55357 \u56803 \u65039  Read story</button>\
+            </div>\
+\
+            <div class="toast" id="startTip" aria-live="polite">\
+              <div>\
+                <strong id="tipTitle">Tip</strong><br/>\
+                <span id="tipText">Teacher can open \uc0\u9881 \u65039  to change language and mode.</span>\
+              </div>\
+              <button class="miniBtn" id="closeTipBtn">OK</button>\
+            </div>\
+          </div>\
+\
+          <div class="card bigCharacter" aria-label="Character">\
+            <div class="charFace" id="charFace" aria-hidden="true">\uc0\u9729 \u65039 \u55357 \u56475 </div>\
+            <div class="charName" id="charName">Sunny the Cloud</div>\
+            <div class="finePrint" id="charLine" style="text-align:center; max-width: 320px;"></div>\
+          </div>\
+        </div>\
+      </section>\
+\
+      <!-- HOW TO PLAY SCREEN -->\
+      <section id="howScreen" class="screen">\
+        <div class="card">\
+          <h2 id="howTitle" style="margin:0 0 10px 0;">How to play</h2>\
+          <div class="storyText" id="howText"></div>\
+          <div class="actions">\
+            <button class="primaryBtn" id="backFromHowBtn">\uc0\u11013 \u65039  Back</button>\
+          </div>\
+        </div>\
+      </section>\
+\
+      <!-- GAME SCREEN -->\
+      <section id="gameScreen" class="screen">\
+        <div class="gameTop">\
+          <div class="status">\
+            <div class="badge" id="levelBadge">Level <span id="levelNum">1</span></div>\
+            <div class="badge" id="starsBadge">Stars <span class="stars" id="starsText">\uc0\u11088 </span></div>\
+            <div class="badge" id="progressBadge"><span id="progressText">0 / 2</span></div>\
+          </div>\
+          <div class="status">\
+            <div class="badge hint" id="modeHint">Mode: Tap</div>\
+            <button class="secondaryBtn" id="resetBtn" style="min-width:180px;">\uc0\u55357 \u56580  Reset</button>\
+          </div>\
+        </div>\
+\
+        <div class="board">\
+          <div class="card">\
+            <div class="columnTitle">\
+              <h2 id="weatherTitle">Weather</h2>\
+              <span class="sub" id="weatherSub"></span>\
+            </div>\
+            <div class="grid" id="weatherGrid" aria-label="Weather cards"></div>\
+          </div>\
+\
+          <div class="card">\
+            <div class="columnTitle">\
+              <h2 id="itemsTitle">Things</h2>\
+              <span class="sub" id="itemsSub"></span>\
+            </div>\
+            <div class="grid" id="itemsGrid" aria-label="Item cards"></div>\
+          </div>\
+        </div>\
+\
+        <div class="toast" id="gameToast" aria-live="polite">\
+          <div>\
+            <strong id="toastTitle">Let\'92s match!</strong><br/>\
+            <span id="toastText">Pick a weather, then pick a thing.</span>\
+          </div>\
+          <button class="miniBtn" id="toastBtn">\uc0\u55357 \u56397 </button>\
+        </div>\
+      </section>\
+\
+      <!-- END SCREEN -->\
+      <section id="endScreen" class="screen">\
+        <div class="card center">\
+          <div class="confetti" aria-hidden="true">\uc0\u55356 \u57225  \u55356 \u57226  \u10024  \u55356 \u57225  \u55356 \u57226 </div>\
+          <div class="bigWin" aria-hidden="true">\uc0\u55356 \u57286 </div>\
+          <div style="font-weight:1000;font-size:22px" id="endTitle">You did it!</div>\
+          <div style="color:var(--muted);font-weight:800" id="endText"></div>\
+          <div class="badge" style="justify-content:center">\
+            <span id="finalStarsLabel">Stars</span>\
+            <span class="stars" id="finalStars">\uc0\u11088 \u11088 \u11088 </span>\
+          </div>\
+          <div class="actions" style="justify-content:center">\
+            <button class="primaryBtn" id="playAgainBtn">\uc0\u55357 \u56577  Play again</button>\
+            <button class="secondaryBtn" id="backToStartBtn">\uc0\u55356 \u57312  Home</button>\
+          </div>\
+        </div>\
+      </section>\
+    </main>\
+\
+    <!-- TEACHER PANEL -->\
+    <div class="panelOverlay" id="panelOverlay" aria-hidden="true">\
+      <div class="panel" role="dialog" aria-modal="true" aria-label="Teacher settings">\
+        <div class="panelHeader">\
+          <strong id="teacherTitle">Teacher Settings</strong>\
+          <button class="gearBtn" id="closePanelBtn" aria-label="Close teacher settings" title="Close">\uc0\u10006 \u65039 </button>\
+        </div>\
+\
+        <div class="panelBody">\
+          <div class="panelSection">\
+            <h3 id="langTitle">Language</h3>\
+            <div class="row radioGroup" id="langGroup">\
+              <label><input type="radio" name="lang" value="en" checked> English</label>\
+              <label><input type="radio" name="lang" value="ro"> Rom\'e2n\uc0\u259 </label>\
+            </div>\
+            <div class="finePrint" id="langNote"></div>\
+          </div>\
+\
+          <div class="panelSection">\
+            <h3 id="modeTitle">Play mode</h3>\
+            <div class="row radioGroup" id="modeGroup">\
+              <label><input type="radio" name="mode" value="tap" checked> Tap-to-match</label>\
+              <label><input type="radio" name="mode" value="drag"> Drag-and-drop</label>\
+            </div>\
+            <div class="finePrint" id="modeNote"></div>\
+          </div>\
+\
+          <div class="panelSection">\
+            <h3 id="pairsTitle">Choose pairs (select 6)</h3>\
+            <div class="checkGroup" id="pairsList"></div>\
+            <div class="finePrint" id="pairsNote"></div>\
+          </div>\
+\
+          <div class="panelSection">\
+            <h3 id="levelTitle">Levels</h3>\
+            <div class="finePrint" id="levelNote"></div>\
+          </div>\
+        </div>\
+\
+        <div class="panelFooter">\
+          <button class="smallBtn secondary" id="panelCancelBtn">Cancel</button>\
+          <button class="smallBtn primary" id="panelApplyBtn">Apply</button>\
+        </div>\
+      </div>\
+    </div>\
+\
+  </div>\
+\
+<script>\
+(() => \{\
+  // -------------------------\
+  // Data (EN/RO hardcoded)\
+  // -------------------------\
+  const ALL_PAIRS = [\
+    \{\
+      id: "sunny_sunglasses",\
+      weatherEmoji: "\uc0\u9728 \u65039 ",\
+      itemEmoji: "\uc0\u55357 \u56694 \u65039 ",\
+      color: "rgba(255, 193, 7, 0.18)",\
+      en: \{ weather: "Sunny", item: "Sunglasses", hint: "Bright sun!" \},\
+      ro: \{ weather: "\'censorit", item: "Ochelari de soare", hint: "Soare puternic!" \}\
+    \},\
+    \{\
+      id: "rainy_umbrella",\
+      weatherEmoji: "\uc0\u55356 \u57127 \u65039 ",\
+      itemEmoji: "\uc0\u9730 \u65039 ",\
+      color: "rgba(59, 130, 246, 0.18)",\
+      en: \{ weather: "Rainy", item: "Umbrella", hint: "Stay dry!" \},\
+      ro: \{ weather: "Ploios", item: "Umbrel\uc0\u259 ", hint: "Stai uscat!" \}\
+    \},\
+    \{\
+      id: "snowy_gloves",\
+      weatherEmoji: "\uc0\u10052 \u65039 ",\
+      itemEmoji: "\uc0\u55358 \u56804 ",\
+      color: "rgba(147, 197, 253, 0.22)",\
+      en: \{ weather: "Snowy", item: "Gloves", hint: "Warm hands!" \},\
+      ro: \{ weather: "Ninge", item: "M\uc0\u259 nu\u537 i", hint: "M\'e2ini calde!" \}\
+    \},\
+    \{\
+      id: "windy_kite",\
+      weatherEmoji: "\uc0\u55357 \u56488 ",\
+      itemEmoji: "\uc0\u55358 \u56961 ",\
+      color: "rgba(34, 197, 94, 0.16)",\
+      en: \{ weather: "Windy", item: "Kite", hint: "Fly it!" \},\
+      ro: \{ weather: "V\'e2nt", item: "Zmeu", hint: "Zboar\uc0\u259 !" \}\
+    \},\
+    \{\
+      id: "stormy_raincoat",\
+      weatherEmoji: "\uc0\u9928 \u65039 ",\
+      itemEmoji: "\uc0\u55358 \u56805 ",\
+      color: "rgba(168, 85, 247, 0.14)",\
+      en: \{ weather: "Stormy", item: "Raincoat", hint: "Safe & dry!" \},\
+      ro: \{ weather: "Furtun\uc0\u259 ", item: "Pelerin\u259 ", hint: "Sigur & uscat!" \}\
+    \},\
+    \{\
+      id: "cloudy_picnic",\
+      weatherEmoji: "\uc0\u9729 \u65039 ",\
+      itemEmoji: "\uc0\u55358 \u56826 ",\
+      color: "rgba(100, 116, 139, 0.14)",\
+      en: \{ weather: "Cloudy", item: "Picnic basket", hint: "Cozy day!" \},\
+      ro: \{ weather: "\'cennorat", item: "Co\uc0\u537  de picnic", hint: "Zi lini\u537 tit\u259 !" \}\
+    \},\
+    // optional extras\
+    \{\
+      id: "hot_water",\
+      weatherEmoji: "\uc0\u55357 \u56613 ",\
+      itemEmoji: "\uc0\u55358 \u56676 ",\
+      color: "rgba(251, 146, 60, 0.16)",\
+      en: \{ weather: "Hot", item: "Water", hint: "Drink water!" \},\
+      ro: \{ weather: "Foarte cald", item: "Ap\uc0\u259 ", hint: "Bea ap\u259 !" \}\
+    \},\
+    \{\
+      id: "foggy_flashlight",\
+      weatherEmoji: "\uc0\u55356 \u57131 \u65039 ",\
+      itemEmoji: "\uc0\u55357 \u56614 ",\
+      color: "rgba(148, 163, 184, 0.18)",\
+      en: \{ weather: "Foggy", item: "Flashlight", hint: "See better!" \},\
+      ro: \{ weather: "Cea\uc0\u539 \u259 ", item: "Lantern\u259 ", hint: "Vezi mai bine!" \}\
+    \}\
+  ];\
+\
+  const UI_TEXT = \{\
+    en: \{\
+      appTitle: "Weather Match Adventure",\
+      appSubtitle: "Offline \'95 Big buttons \'95 Ages 5\'966",\
+      sound: "Sound", on:"On", off:"Off",\
+      read: "Read", readStory:"Read story",\
+      start: "Start",\
+      how: "How to play",\
+      back: "Back",\
+      tipTitle:"Tip",\
+      tipText:"Teacher can open \uc0\u9881 \u65039  to change language and mode.",\
+      charName:"Sunny the Cloud",\
+      charLine:"Help Sunny choose the right thing for each weather!",\
+      story: [\
+        "<p><strong>Hi! I\'92m Sunny the Cloud!</strong> \uc0\u9729 \u65039 \u55357 \u56475 </p>",\
+        "<p>I\'92m going on a little trip through different weather.</p>",\
+        "<p>Can you help me pick the <strong>right thing</strong> each time?</p>",\
+        "<p>Tap or drag to match. Let\'92s earn stars! \uc0\u11088 </p>"\
+      ].join(""),\
+      nameLabel:"Name:",\
+      namePlaceholder:"Alex",\
+      nameNote:"Optional. Teacher can type the child\'92s name.",\
+      howText: [\
+        "<p><strong>Tap Mode:</strong> Tap a weather card, then tap the matching item card.</p>",\
+        "<p><strong>Drag Mode:</strong> Drag an item card onto the matching weather card.</p>",\
+        "<p>You earn \uc0\u11088  for every correct match. Finish all matches to go to the next level!</p>"\
+      ].join(""),\
+      level:"Level",\
+      stars:"Stars",\
+      modeTap:"Mode: Tap",\
+      modeDrag:"Mode: Drag",\
+      reset:"Reset",\
+      weatherTitle:"Weather",\
+      weatherSub:"Pick the weather",\
+      itemsTitle:"Things",\
+      itemsSub:"Pick the matching thing",\
+      toastStartTitle:"Let\'92s match!",\
+      toastTap:"Tap weather, then tap thing.",\
+      toastDrag:"Drag a thing onto the matching weather.",\
+      toastGood:["Great job!","Awesome!","Yes!","Nice match!","Yay!"].slice(),\
+      toastTry:["Try again!","Almost!","Oops\'97try again!","Not that one. Try another!"].slice(),\
+      endTitle:"You did it!",\
+      endText:(name)=> name ? `Bravo, $\{name\}! Sunny is ready for every weather now!` : "Bravo! Sunny is ready for every weather now!",\
+      playAgain:"Play again",\
+      home:"Home",\
+      teacherTitle:"Teacher Settings",\
+      langTitle:"Language",\
+      langNote:"Changes labels and story text.",\
+      modeTitle:"Play mode",\
+      modeNote:"Tap mode is easiest for touch screens.",\
+      pairsTitle:"Choose pairs (select 6)",\
+      pairsNote:"If more than 6 are checked, only the first 6 will be used.",\
+      levelsTitle:"Levels",\
+      levelNote:"The game always plays 3 levels: 2 matches, then 4, then 6.",\
+      cancel:"Cancel",\
+      apply:"Apply",\
+      progress:(done,total)=>`$\{done\} / $\{total\}`\
+    \},\
+    ro: \{\
+      appTitle: "Aventura Potrivirilor de Vreme",\
+      appSubtitle: "Offline \'95 Butoane mari \'95 5\'966 ani",\
+      sound: "Sunet", on:"Pornit", off:"Oprit",\
+      read: "Cite\uc0\u537 te", readStory:"Cite\u537 te povestea",\
+      start: "Start",\
+      how: "Cum se joac\uc0\u259 ",\
+      back: "\'cenapoi",\
+      tipTitle:"Sfat",\
+      tipText:"Profesorul poate deschide \uc0\u9881 \u65039  pentru limb\u259  \u537 i mod.",\
+      charName:"Sunny Norule\uc0\u539 ul",\
+      charLine:"Ajut\uc0\u259 -l pe Sunny s\u259  aleag\u259  lucrul potrivit pentru fiecare vreme!",\
+      story: [\
+        "<p><strong>Salut! Eu sunt Sunny Norule\uc0\u539 ul!</strong> \u9729 \u65039 \u55357 \u56475 </p>",\
+        "<p>Merg \'eentr-o mic\uc0\u259  plimbare prin diferite tipuri de vreme.</p>",\
+        "<p>M\uc0\u259  aju\u539 i s\u259  aleg <strong>lucrul potrivit</strong> de fiecare dat\u259 ?</p>",\
+        "<p>Atinge sau trage ca s\uc0\u259  potrive\u537 ti. Str\'e2ngem stele! \u11088 </p>"\
+      ].join(""),\
+      nameLabel:"Nume:",\
+      namePlaceholder:"Alex",\
+      nameNote:"Op\uc0\u539 ional. Profesorul poate scrie numele copilului.",\
+      howText: [\
+        "<p><strong>Mod Atinge:</strong> Atinge o carte de vreme, apoi atinge lucrul potrivit.</p>",\
+        "<p><strong>Mod Trage:</strong> Trage un lucru peste vremea potrivit\uc0\u259 .</p>",\
+        "<p>Prime\uc0\u537 ti \u11088  pentru fiecare potrivire corect\u259 . C\'e2nd termini, mergi la nivelul urm\u259 tor!</p>"\
+      ].join(""),\
+      level:"Nivel",\
+      stars:"Stele",\
+      modeTap:"Mod: Atinge",\
+      modeDrag:"Mod: Trage",\
+      reset:"Re\'eencepe",\
+      weatherTitle:"Vremea",\
+      weatherSub:"Alege vremea",\
+      itemsTitle:"Lucruri",\
+      itemsSub:"Alege lucrul potrivit",\
+      toastStartTitle:"Hai s\uc0\u259  potrivim!",\
+      toastTap:"Atinge vremea, apoi lucrul.",\
+      toastDrag:"Trage un lucru peste vremea potrivit\uc0\u259 .",\
+      toastGood:["Bravo!","Super!","Da!","Potrivire bun\uc0\u259 !","Juhu!"].slice(),\
+      toastTry:["Mai \'eencearc\uc0\u259 !","Aproape!","Ups\'97mai \'eencearc\u259 !","Nu e acela. \'cencearc\u259  altul!"].slice(),\
+      endTitle:"Ai reu\uc0\u537 it!",\
+      endText:(name)=> name ? `Bravo, $\{name\}! Acum Sunny e preg\uc0\u259 tit pentru orice vreme!` : "Bravo! Acum Sunny e preg\u259 tit pentru orice vreme!",\
+      playAgain:"Joac\uc0\u259  din nou",\
+      home:"Acas\uc0\u259 ",\
+      teacherTitle:"Set\uc0\u259 ri (Profesor)",\
+      langTitle:"Limb\uc0\u259 ",\
+      langNote:"Schimb\uc0\u259  textele \u537 i povestea.",\
+      modeTitle:"Mod de joc",\
+      modeNote:"Modul Atinge e cel mai u\uc0\u537 or pe ecran tactil.",\
+      pairsTitle:"Alege perechi (selecteaz\uc0\u259  6)",\
+      pairsNote:"Dac\uc0\u259  bifezi mai mult de 6, se folosesc doar primele 6.",\
+      levelsTitle:"Niveluri",\
+      levelNote:"Sunt mereu 3 niveluri: 2 potriviri, apoi 4, apoi 6.",\
+      cancel:"Anuleaz\uc0\u259 ",\
+      apply:"Aplic\uc0\u259 ",\
+      progress:(done,total)=>`$\{done\} / $\{total\}`\
+    \}\
+  \};\
+\
+  // -------------------------\
+  // State\
+  // -------------------------\
+  const defaultSettings = \{\
+    lang: "en",\
+    mode: "tap",      // "tap" or "drag"\
+    soundOn: true,\
+    ttsOn: false,\
+    playerName: "",\
+    selectedPairIds: [\
+      "sunny_sunglasses",\
+      "rainy_umbrella",\
+      "snowy_gloves",\
+      "windy_kite",\
+      "stormy_raincoat",\
+      "cloudy_picnic"\
+    ]\
+  \};\
+\
+  let settings = loadSettings();\
+  let ui = UI_TEXT[settings.lang];\
+\
+  const LEVELS = [2,4,6];\
+  let levelIndex = 0;\
+  let pairsInUse = [];\
+  let levelPairs = [];\
+  let matchedWeatherIds = new Set();\
+  let matchedItemIds = new Set();\
+  let selection = \{ weatherId:null, itemId:null \};\
+  let stars = 0;\
+\
+  // Audio + Speech\
+  let audioCtx = null;\
+  let lastToastTimeout = null;\
+\
+  // DOM\
+  const $ = (id) => document.getElementById(id);\
+  const screens = \{\
+    start: $("startScreen"),\
+    how: $("howScreen"),\
+    game: $("gameScreen"),\
+    end: $("endScreen")\
+  \};\
+\
+  function showScreen(name)\{\
+    Object.values(screens).forEach(s => s.classList.remove("active"));\
+    screens[name].classList.add("active");\
+  \}\
+  function randPick(arr)\{ return arr[Math.floor(Math.random()*arr.length)]; \}\
+  function safeText(el, text)\{ el.textContent = text; \}\
+  function setToggle(el, on)\{\
+    el.classList.toggle("on", on);\
+    el.setAttribute("aria-checked", on ? "true" : "false");\
+  \}\
+\
+  // -------------------------\
+  // Storage\
+  // -------------------------\
+  function loadSettings()\{\
+    try\{\
+      const raw = localStorage.getItem("weatherMatchSettingsV2");\
+      if(!raw) return structuredClone(defaultSettings);\
+      const parsed = JSON.parse(raw);\
+      return \{ ...structuredClone(defaultSettings), ...parsed \};\
+    \}catch(e)\{\
+      return structuredClone(defaultSettings);\
+    \}\
+  \}\
+  function saveSettings()\{\
+    try\{ localStorage.setItem("weatherMatchSettingsV2", JSON.stringify(settings)); \}catch(e)\{\}\
+  \}\
+\
+  // -------------------------\
+  // Language refresh\
+  // -------------------------\
+  function applyLanguage()\{\
+    ui = UI_TEXT[settings.lang];\
+\
+    safeText($("appTitle"), ui.appTitle);\
+    safeText($("appSubtitle"), ui.appSubtitle);\
+\
+    safeText($("soundLabel"), ui.sound);\
+    safeText($("soundState"), settings.soundOn ? ui.on : ui.off);\
+    safeText($("ttsLabel"), ui.read);\
+    safeText($("ttsState"), settings.ttsOn ? ui.on : ui.off);\
+\
+    $("storyText").innerHTML = ui.story;\
+\
+    safeText($("nameLabel"), ui.nameLabel);\
+    $("playerNameInput").placeholder = ui.namePlaceholder;\
+    safeText($("nameNote"), ui.nameNote);\
+\
+    safeText($("startBtn"), "\uc0\u9654 \u65039  " + ui.start);\
+    safeText($("howBtn"), "\uc0\u10067  " + ui.how);\
+    safeText($("readStoryBtn"), "\uc0\u55357 \u56803 \u65039  " + ui.readStory);\
+\
+    safeText($("tipTitle"), ui.tipTitle);\
+    safeText($("tipText"), ui.tipText);\
+\
+    safeText($("charName"), ui.charName);\
+    safeText($("charLine"), ui.charLine);\
+\
+    safeText($("howTitle"), ui.how);\
+    $("howText").innerHTML = ui.howText;\
+    safeText($("backFromHowBtn"), "\uc0\u11013 \u65039  " + ui.back);\
+\
+    // Badges\
+    $("levelBadge").childNodes[0].textContent = ui.level + " ";\
+    $("starsBadge").childNodes[0].textContent = ui.stars + " ";\
+    safeText($("resetBtn"), "\uc0\u55357 \u56580  " + ui.reset);\
+\
+    safeText($("weatherTitle"), ui.weatherTitle);\
+    safeText($("weatherSub"), ui.weatherSub);\
+    safeText($("itemsTitle"), ui.itemsTitle);\
+    safeText($("itemsSub"), ui.itemsSub);\
+\
+    // Teacher panel labels\
+    safeText($("teacherTitle"), ui.teacherTitle);\
+    safeText($("langTitle"), ui.langTitle);\
+    safeText($("langNote"), ui.langNote);\
+    safeText($("modeTitle"), ui.modeTitle);\
+    safeText($("modeNote"), ui.modeNote);\
+    safeText($("pairsTitle"), ui.pairsTitle);\
+    safeText($("pairsNote"), ui.pairsNote);\
+    safeText($("levelTitle"), ui.levelsTitle);\
+    safeText($("levelNote"), ui.levelNote);\
+\
+    safeText($("panelCancelBtn"), ui.cancel);\
+    safeText($("panelApplyBtn"), ui.apply);\
+\
+    safeText($("endTitle"), ui.endTitle);\
+    safeText($("playAgainBtn"), "\uc0\u55357 \u56577  " + ui.playAgain);\
+    safeText($("backToStartBtn"), "\uc0\u55356 \u57312  " + ui.home);\
+    safeText($("finalStarsLabel"), ui.stars);\
+\
+    updateModeHint();\
+    updateToast(ui.toastStartTitle, settings.mode === "tap" ? ui.toastTap : ui.toastDrag);\
+\
+    buildPairsList();\
+  \}\
+\
+  function updateModeHint()\{\
+    safeText($("modeHint"), settings.mode === "tap" ? ui.modeTap : ui.modeDrag);\
+  \}\
+\
+  // -------------------------\
+  // Teacher panel\
+  // -------------------------\
+  function buildPairsList()\{\
+    const container = $("pairsList");\
+    container.innerHTML = "";\
+\
+    const selectedSet = new Set(settings.selectedPairIds);\
+    ALL_PAIRS.forEach(p => \{\
+      const label = document.createElement("label");\
+      const inp = document.createElement("input");\
+      inp.type = "checkbox";\
+      inp.value = p.id;\
+      inp.checked = selectedSet.has(p.id);\
+\
+      const txt = document.createElement("div");\
+      txt.style.display = "flex";\
+      txt.style.flexDirection = "column";\
+      txt.style.gap = "2px";\
+\
+      const main = document.createElement("div");\
+      main.style.fontWeight = "1000";\
+      main.textContent = `$\{p.weatherEmoji\} $\{p[settings.lang].weather\}  +  $\{p.itemEmoji\} $\{p[settings.lang].item\}`;\
+\
+      const sub = document.createElement("div");\
+      sub.style.fontSize = "12px";\
+      sub.style.color = "var(--muted)";\
+      sub.style.fontWeight = "800";\
+      sub.textContent = p[settings.lang].hint;\
+\
+      txt.appendChild(main);\
+      txt.appendChild(sub);\
+\
+      label.appendChild(inp);\
+      label.appendChild(txt);\
+      container.appendChild(label);\
+    \});\
+  \}\
+\
+  function openPanel()\{\
+    $("panelOverlay").classList.add("show");\
+    $("panelOverlay").setAttribute("aria-hidden","false");\
+\
+    document.querySelectorAll('input[name="lang"]').forEach(r => r.checked = (r.value === settings.lang));\
+    document.querySelectorAll('input[name="mode"]').forEach(r => r.checked = (r.value === settings.mode));\
+    buildPairsList();\
+\
+    setTimeout(() => \{\
+      const first = document.querySelector('#panelOverlay input');\
+      if(first) first.focus();\
+    \}, 0);\
+  \}\
+\
+  function closePanel()\{\
+    $("panelOverlay").classList.remove("show");\
+    $("panelOverlay").setAttribute("aria-hidden","true");\
+    $("gearBtn").focus();\
+  \}\
+\
+  function applyPanel()\{\
+    const lang = document.querySelector('input[name="lang"]:checked')?.value || "en";\
+    const mode = document.querySelector('input[name="mode"]:checked')?.value || "tap";\
+    const checked = Array.from(document.querySelectorAll('#pairsList input[type="checkbox"]:checked'))\
+      .map(x => x.value);\
+\
+    let chosen = checked.slice(0,6);\
+    if(chosen.length < 6)\{\
+      for(const p of ALL_PAIRS)\{\
+        if(chosen.length >= 6) break;\
+        if(!chosen.includes(p.id)) chosen.push(p.id);\
+      \}\
+    \}\
+\
+    settings.lang = lang;\
+    settings.mode = mode;\
+    settings.selectedPairIds = chosen;\
+\
+    saveSettings();\
+    applyLanguage();\
+\
+    resetGame(true);\
+    closePanel();\
+  \}\
+\
+  // -------------------------\
+  // Game\
+  // -------------------------\
+  function shuffle(arr)\{\
+    const a = arr.slice();\
+    for(let i=a.length-1;i>0;i--)\{\
+      const j = Math.floor(Math.random()*(i+1));\
+      [a[i],a[j]] = [a[j],a[i]];\
+    \}\
+    return a;\
+  \}\
+\
+  function computePairsInUse()\{\
+    const selected = settings.selectedPairIds.slice(0,6);\
+    const map = new Map(ALL_PAIRS.map(p => [p.id, p]));\
+    pairsInUse = selected.map(id => map.get(id)).filter(Boolean);\
+\
+    while(pairsInUse.length < 6)\{\
+      const next = ALL_PAIRS.find(p => !pairsInUse.includes(p));\
+      if(!next) break;\
+      pairsInUse.push(next);\
+    \}\
+  \}\
+\
+  function startNewLevel()\{\
+    matchedWeatherIds.clear();\
+    matchedItemIds.clear();\
+    selection.weatherId = null;\
+    selection.itemId = null;\
+\
+    const n = [2,4,6][levelIndex];\
+    levelPairs = pairsInUse.slice(0, n);\
+\
+    renderLevel();\
+    updateHUD();\
+    updateToast(ui.toastStartTitle, settings.mode === "tap" ? ui.toastTap : ui.toastDrag);\
+  \}\
+\
+  function updateHUD()\{\
+    safeText($("levelNum"), String(levelIndex+1));\
+    safeText($("starsText"), "\uc0\u11088 ".repeat(Math.max(1, Math.min(10, stars))) + (stars > 10 ? ` +$\{stars-10\}` : ""));\
+    safeText($("progressText"), ui.progress(matchedWeatherIds.size, levelPairs.length));\
+  \}\
+\
+  function getCard(kind, id)\{\
+    return document.querySelector(`.matchCard[data-kind="$\{kind\}"][data-id="$\{id\}"]`);\
+  \}\
+\
+  function clearSelection()\{\
+    selection.weatherId = null;\
+    selection.itemId = null;\
+    document.querySelectorAll(".matchCard.selected").forEach(el => el.classList.remove("selected"));\
+  \}\
+\
+  function renderLevel()\{\
+    const weatherGrid = $("weatherGrid");\
+    const itemsGrid = $("itemsGrid");\
+    weatherGrid.innerHTML = "";\
+    itemsGrid.innerHTML = "";\
+\
+    const wOrder = shuffle(levelPairs);\
+    const iOrder = shuffle(levelPairs);\
+\
+    for(const p of wOrder)\{\
+      const btn = document.createElement("button");\
+      btn.type = "button";\
+      btn.className = "matchCard weatherCard";\
+      btn.dataset.kind = "weather";\
+      btn.dataset.id = p.id;\
+      btn.style.background = `linear-gradient(135deg, $\{p.color\}, rgba(255,255,255,0.85))`;\
+      btn.innerHTML = `\
+        <div class="emoji" aria-hidden="true">$\{p.weatherEmoji\}</div>\
+        <div class="label">$\{p[settings.lang].weather\}</div>\
+        <div class="sub">$\{p[settings.lang].hint\}</div>\
+      `;\
+      btn.setAttribute("aria-label", `$\{p[settings.lang].weather\}`);\
+      btn.tabIndex = 0;\
+\
+      btn.addEventListener("dragover", (e) => \{\
+        if(settings.mode !== "drag") return;\
+        e.preventDefault();\
+      \});\
+      btn.addEventListener("drop", (e) => \{\
+        if(settings.mode !== "drag") return;\
+        e.preventDefault();\
+        const itemId = e.dataTransfer.getData("text/plain");\
+        if(!itemId) return;\
+        tryMatch(p.id, itemId);\
+      \});\
+\
+      btn.addEventListener("click", () => \{\
+        if(settings.mode !== "tap") return;\
+        if(matchedWeatherIds.has(p.id)) return;\
+        selectWeather(p.id);\
+      \});\
+\
+      weatherGrid.appendChild(btn);\
+    \}\
+\
+    for(const p of iOrder)\{\
+      const btn = document.createElement("button");\
+      btn.type = "button";\
+      btn.className = "matchCard itemCard";\
+      btn.dataset.kind = "item";\
+      btn.dataset.id = p.id;\
+      btn.style.background = `linear-gradient(135deg, rgba(45,191,108,0.08), $\{p.color\})`;\
+      btn.innerHTML = `\
+        <div class="emoji" aria-hidden="true">$\{p.itemEmoji\}</div>\
+        <div class="label">$\{p[settings.lang].item\}</div>\
+        <div class="sub"> </div>\
+      `;\
+      btn.setAttribute("aria-label", `$\{p[settings.lang].item\}`);\
+      btn.tabIndex = 0;\
+\
+      if(settings.mode === "drag")\{\
+        btn.setAttribute("draggable","true");\
+        btn.addEventListener("dragstart", (e) => \{\
+          if(matchedItemIds.has(p.id)) return;\
+          e.dataTransfer.setData("text/plain", p.id);\
+          btn.classList.add("selected");\
+          setTimeout(()=>btn.classList.remove("selected"), 150);\
+        \});\
+      \} else \{\
+        btn.removeAttribute("draggable");\
+      \}\
+\
+      btn.addEventListener("click", () => \{\
+        if(settings.mode !== "tap") return;\
+        if(matchedItemIds.has(p.id)) return;\
+        selectItem(p.id);\
+      \});\
+\
+      itemsGrid.appendChild(btn);\
+    \}\
+\
+    $("toastBtn").onclick = () => \{\
+      clearSelection();\
+      updateToast(ui.toastStartTitle, settings.mode === "tap" ? ui.toastTap : ui.toastDrag);\
+    \};\
+  \}\
+\
+  function selectWeather(id)\{\
+    selection.weatherId = (selection.weatherId === id) ? null : id;\
+    document.querySelectorAll('.matchCard[data-kind="weather"]').forEach(el => el.classList.remove("selected"));\
+    if(selection.weatherId)\{\
+      const el = getCard("weather", selection.weatherId);\
+      if(el) el.classList.add("selected");\
+    \}\
+    maybeTryTapMatch();\
+  \}\
+\
+  function selectItem(id)\{\
+    selection.itemId = (selection.itemId === id) ? null : id;\
+    document.querySelectorAll('.matchCard[data-kind="item"]').forEach(el => el.classList.remove("selected"));\
+    if(selection.itemId)\{\
+      const el = getCard("item", selection.itemId);\
+      if(el) el.classList.add("selected");\
+    \}\
+    maybeTryTapMatch();\
+  \}\
+\
+  function maybeTryTapMatch()\{\
+    if(settings.mode !== "tap") return;\
+    if(selection.weatherId && selection.itemId)\{\
+      tryMatch(selection.weatherId, selection.itemId);\
+    \} else \{\
+      if(selection.weatherId && !selection.itemId)\{\
+        updateToast(ui.toastStartTitle, settings.lang==="ro" ? "Acum atinge un lucru potrivit." : "Now tap a matching thing.");\
+      \} else if(!selection.weatherId && selection.itemId)\{\
+        updateToast(ui.toastStartTitle, settings.lang==="ro" ? "Acum atinge o vreme potrivit\uc0\u259 ." : "Now tap a matching weather.");\
+      \}\
+    \}\
+  \}\
+\
+  function tryMatch(weatherId, itemId)\{\
+    if(matchedWeatherIds.has(weatherId) || matchedItemIds.has(itemId)) return;\
+\
+    const correct = (weatherId === itemId);\
+    const wEl = getCard("weather", weatherId);\
+    const iEl = getCard("item", itemId);\
+    [wEl,iEl].forEach(el => el && el.classList.remove("wrong"));\
+\
+    if(correct)\{\
+      matchedWeatherIds.add(weatherId);\
+      matchedItemIds.add(itemId);\
+      stars += 1;\
+\
+      [wEl,iEl].forEach(el => \{\
+        if(!el) return;\
+        el.classList.remove("selected");\
+        el.classList.add("correct","locked");\
+        el.disabled = true;\
+      \});\
+\
+      playSuccessSound();\
+      updateHUD();\
+\
+      const msg = randPick(ui.toastGood);\
+      updateToast(msg, "\uc0\u9989 ");\
+\
+      if(settings.ttsOn)\{\
+        speak(msg + (settings.lang==="ro" ? ". Corect!" : ". Correct!"));\
+      \}\
+\
+      clearSelection();\
+\
+      if(matchedWeatherIds.size === levelPairs.length)\{\
+        setTimeout(() => advanceLevelOrEnd(), 650);\
+      \}\
+    \} else \{\
+      if(wEl) wEl.classList.add("wrong");\
+      if(iEl) iEl.classList.add("wrong");\
+      playTryAgainSound();\
+\
+      const msg = randPick(ui.toastTry);\
+      updateToast(msg, settings.lang==="ro" ? "\'cencearc\uc0\u259  o alt\u259  pereche." : "Try a different pair.");\
+\
+      if(settings.ttsOn)\{ speak(msg); \}\
+\
+      setTimeout(() => \{\
+        if(wEl) wEl.classList.remove("wrong");\
+        if(iEl) iEl.classList.remove("wrong");\
+        clearSelection();\
+      \}, 450);\
+    \}\
+  \}\
+\
+  function advanceLevelOrEnd()\{\
+    levelIndex += 1;\
+    if(levelIndex >= 3) showEnd();\
+    else startNewLevel();\
+  \}\
+\
+  function showEnd()\{\
+    showScreen("end");\
+    const name = (settings.playerName || "").trim();\
+    safeText($("endText"), ui.endText(name));\
+    safeText($("finalStars"), "\uc0\u11088 ".repeat(Math.max(1, Math.min(10, stars))) + (stars > 10 ? ` +$\{stars-10\}` : ""));\
+\
+    if(settings.ttsOn)\{\
+      const say = settings.lang==="ro"\
+        ? (name ? `Bravo, $\{name\}! Ai reu\uc0\u537 it!` : "Bravo! Ai reu\u537 it!")\
+        : (name ? `Bravo, $\{name\}! You did it!` : "Bravo! You did it!");\
+      speak(say);\
+    \}\
+  \}\
+\
+  // -------------------------\
+  // Toast\
+  // -------------------------\
+  function updateToast(title, text)\{\
+    safeText($("toastTitle"), title);\
+    safeText($("toastText"), text);\
+    if(lastToastTimeout) clearTimeout(lastToastTimeout);\
+    lastToastTimeout = setTimeout(() => \{\
+      if(!screens.game.classList.contains("active")) return;\
+      safeText($("toastTitle"), ui.toastStartTitle);\
+      safeText($("toastText"), settings.mode === "tap" ? ui.toastTap : ui.toastDrag);\
+    \}, 5200);\
+  \}\
+\
+  // -------------------------\
+  // Audio (Web Audio)\
+  // -------------------------\
+  function ensureAudio()\{\
+    if(!audioCtx)\{\
+      const AudioContext = window.AudioContext || window.webkitAudioContext;\
+      if(AudioContext) audioCtx = new AudioContext();\
+    \}\
+    if(audioCtx && audioCtx.state === "suspended")\{\
+      audioCtx.resume().catch(()=>\{\});\
+    \}\
+  \}\
+  function beep(freq, durationMs, type="sine", gain=0.08)\{\
+    if(!settings.soundOn) return;\
+    ensureAudio();\
+    if(!audioCtx) return;\
+\
+    const t0 = audioCtx.currentTime;\
+    const osc = audioCtx.createOscillator();\
+    const g = audioCtx.createGain();\
+\
+    osc.type = type;\
+    osc.frequency.setValueAtTime(freq, t0);\
+\
+    g.gain.setValueAtTime(0.0001, t0);\
+    g.gain.exponentialRampToValueAtTime(gain, t0 + 0.02);\
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + durationMs/1000);\
+\
+    osc.connect(g).connect(audioCtx.destination);\
+    osc.start(t0);\
+    osc.stop(t0 + durationMs/1000 + 0.03);\
+  \}\
+  function playSuccessSound()\{\
+    beep(660, 120, "triangle", 0.10);\
+    setTimeout(()=>beep(880, 140, "triangle", 0.10), 140);\
+  \}\
+  function playTryAgainSound()\{\
+    beep(220, 160, "sine", 0.08);\
+  \}\
+\
+  // -------------------------\
+  // Speech\
+  // -------------------------\
+  function speak(text)\{\
+    if(!settings.ttsOn) return;\
+    if(!("speechSynthesis" in window)) return;\
+    try\{\
+      window.speechSynthesis.cancel();\
+      const u = new SpeechSynthesisUtterance(text);\
+      u.lang = settings.lang === "ro" ? "ro-RO" : "en-US";\
+      u.rate = 0.95;\
+      u.pitch = 1.05;\
+      window.speechSynthesis.speak(u);\
+    \}catch(e)\{\}\
+  \}\
+\
+  // -------------------------\
+  // Reset / Start\
+  // -------------------------\
+  function resetGame(stayOnGame=false)\{\
+    computePairsInUse();\
+    pairsInUse = shuffle(pairsInUse);\
+\
+    levelIndex = 0;\
+    stars = 0;\
+    clearSelection();\
+    startNewLevel();\
+    updateModeHint();\
+    updateHUD();\
+\
+    if(stayOnGame) showScreen("game");\
+  \}\
+\
+  // -------------------------\
+  // Toggles\
+  // -------------------------\
+  function updateSoundToggleUI()\{\
+    setToggle($("soundToggle"), settings.soundOn);\
+    safeText($("soundState"), settings.soundOn ? ui.on : ui.off);\
+  \}\
+  function updateTtsToggleUI()\{\
+    setToggle($("ttsToggle"), settings.ttsOn);\
+    safeText($("ttsState"), settings.ttsOn ? ui.on : ui.off);\
+  \}\
+\
+  function bindToggle(el, getVal, setVal, after)\{\
+    const flip = () => \{\
+      setVal(!getVal());\
+      saveSettings();\
+      after();\
+    \};\
+    el.addEventListener("click", flip);\
+    el.addEventListener("keydown", (e) => \{\
+      if(e.key === "Enter" || e.key === " ")\{\
+        e.preventDefault();\
+        flip();\
+      \}\
+    \});\
+  \}\
+\
+  // -------------------------\
+  // Events\
+  // -------------------------\
+  function wireUI()\{\
+    // Player name\
+    const nameInput = $("playerNameInput");\
+    nameInput.value = settings.playerName || "";\
+    nameInput.addEventListener("input", () => \{\
+      settings.playerName = nameInput.value.slice(0,18);\
+      saveSettings();\
+    \});\
+\
+    $("startBtn").addEventListener("click", () => \{\
+      // save latest name on start\
+      settings.playerName = nameInput.value.slice(0,18);\
+      saveSettings();\
+      resetGame(true);\
+    \});\
+\
+    $("howBtn").addEventListener("click", () => \{\
+      showScreen("how");\
+      if(settings.ttsOn) speak(settings.lang==="ro" ? "Cum se joac\uc0\u259 ." : "How to play.");\
+    \});\
+\
+    $("backFromHowBtn").addEventListener("click", () => showScreen("start"));\
+\
+    $("resetBtn").addEventListener("click", () => \{\
+      resetGame(true);\
+      updateToast(ui.toastStartTitle, settings.mode === "tap" ? ui.toastTap : ui.toastDrag);\
+    \});\
+\
+    $("playAgainBtn").addEventListener("click", () => resetGame(true));\
+    $("backToStartBtn").addEventListener("click", () => showScreen("start"));\
+\
+    $("closeTipBtn").addEventListener("click", () => \{ $("startTip").style.display = "none"; \});\
+\
+    $("readStoryBtn").addEventListener("click", () => \{\
+      if(!("speechSynthesis" in window))\{\
+        updateToast(settings.lang==="ro" ? "Not\uc0\u259 " : "Note",\
+                   settings.lang==="ro" ? "Browserul nu suport\uc0\u259  citirea." : "Read-aloud is not supported in this browser.");\
+        return;\
+      \}\
+      const name = (settings.playerName || "").trim();\
+      const text = settings.lang==="ro"\
+        ? `Salut! Eu sunt Sunny. $\{name ? "Bun venit, " + name + "!" : ""\} Ajut\uc0\u259 -m\u259  s\u259  potrivesc vremea cu lucrul potrivit.`\
+        : `Hi! I'm Sunny. $\{name ? "Welcome, " + name + "!" : ""\} Help me match weather with the right thing.`;\
+      speak(text);\
+    \});\
+\
+    $("toastBtn").addEventListener("click", () => \{\
+      clearSelection();\
+      updateToast(ui.toastStartTitle, settings.mode === "tap" ? ui.toastTap : ui.toastDrag);\
+    \});\
+\
+    // Teacher panel\
+    $("gearBtn").addEventListener("click", openPanel);\
+    $("closePanelBtn").addEventListener("click", closePanel);\
+    $("panelCancelBtn").addEventListener("click", closePanel);\
+    $("panelApplyBtn").addEventListener("click", applyPanel);\
+\
+    $("panelOverlay").addEventListener("click", (e) => \{\
+      if(e.target === $("panelOverlay")) closePanel();\
+    \});\
+\
+    document.addEventListener("keydown", (e) => \{\
+      if(e.key === "Escape" && $("panelOverlay").classList.contains("show"))\{\
+        closePanel();\
+      \}\
+    \});\
+\
+    // Toggles\
+    bindToggle($("soundToggle"),\
+      () => settings.soundOn,\
+      (v) => \{ settings.soundOn = v; \},\
+      () => \{ updateSoundToggleUI(); if(settings.soundOn) playSuccessSound(); \}\
+    );\
+\
+    bindToggle($("ttsToggle"),\
+      () => settings.ttsOn,\
+      (v) => \{ settings.ttsOn = v; \},\
+      () => \{\
+        updateTtsToggleUI();\
+        if(settings.ttsOn) speak(settings.lang==="ro" ? "Citirea este pornit\uc0\u259 ." : "Read aloud is on.");\
+        else if("speechSynthesis" in window) window.speechSynthesis.cancel();\
+      \}\
+    );\
+  \}\
+\
+  // -------------------------\
+  // Init\
+  // -------------------------\
+  function init()\{\
+    updateSoundToggleUI();\
+    updateTtsToggleUI();\
+\
+    applyLanguage();\
+\
+    // Ensure panel and main UI reflect language\
+    buildPairsList();\
+\
+    wireUI();\
+    showScreen("start");\
+  \}\
+\
+  init();\
+\})();\
+</script>\
+</body>\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx5827\tx5827\tx5827\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 </html>}

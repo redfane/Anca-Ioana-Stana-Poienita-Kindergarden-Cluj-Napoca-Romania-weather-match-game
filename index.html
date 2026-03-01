@@ -1,116 +1,74 @@
 <!DOCTYPE html>
-
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hot Air Balloon Adventure</title>
 <style>
-/* =========================
-   GENERAL STYLES
-========================= */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Comic Sans MS', Arial, sans-serif; }
-body {
-    background: linear-gradient(#87CEEB, #E0F7FF);
-    overflow: hidden;
-}
+body { background: linear-gradient(#87CEEB, #E6F7FF); overflow: hidden; }
 .hidden { display: none; }
-.screen {
-    width: 100vw;
-    height: 100vh;
-    padding: 20px;
-    text-align: center;
-}
+.screen { width: 100vw; height: 100vh; padding: 20px; text-align: center; }
 h1 { font-size: 2.5rem; margin-bottom: 20px; }
+h2 { font-size: 1.8rem; margin: 10px 0; }
+
 button {
-    font-size: 1.2rem;
-    padding: 12px 20px;
-    border-radius: 20px;
+    font-size: 1.4rem;
+    padding: 15px 25px;
+    border-radius: 25px;
     border: none;
     margin: 10px;
     cursor: pointer;
     background: #FFD54F;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
 }
-button:hover { transform: scale(1.05); }
+button:hover { transform: scale(1.08); }
+
 input {
-    font-size: 1.2rem;
-    padding: 10px;
-    border-radius: 15px;
+    font-size: 1.3rem;
+    padding: 12px;
+    border-radius: 20px;
     border: 2px solid #ccc;
     margin: 10px;
-    width: 200px;
+    width: 220px;
     text-align: center;
 }
-.avatar { font-size: 3rem; cursor: pointer; margin: 10px; }
-.selected { border: 3px solid #FF5722; border-radius: 20px; padding: 5px; }
 
-/* =========================
-BALLOON & ANIMATIONS
-========================= */
-.balloon {
-font-size: 4rem;
-position: relative;
-animation: float 3s ease-in-out infinite;
-}
-@keyframes float {
-0% { transform: translateY(0px); }
-50% { transform: translateY(-20px); }
-100% { transform: translateY(0px); }
-}
-.cloud {
-position: absolute;
-top: 50px;
-font-size: 3rem;
-animation: moveCloud 20s linear infinite;
-}
-@keyframes moveCloud {
-0% { left: -100px; }
-100% { left: 100vw; }
-}
-.stars { font-size: 2rem; animation: pop 0.5s ease; }
-@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+.avatar { font-size: 3.5rem; cursor: pointer; margin: 10px; }
+.selected { border: 4px solid #FF5722; border-radius: 20px; padding: 5px; }
 
-/* =========================
-GAME AREA
-========================= */
-.match-container {
-display: flex;
-justify-content: center;
-flex-wrap: wrap;
-margin-top: 30px;
-}
-.card {
-font-size: 2rem;
-padding: 20px;
-margin: 10px;
-border-radius: 20px;
-background: white;
-cursor: pointer;
-box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-#topBar {
-position: absolute;
-top: 10px;
-right: 10px;
-}
-#languageToggle { font-size: 1rem; }
-#gear { cursor: pointer; font-size: 1.5rem; margin-left: 10px; }
+.balloon { font-size: 5rem; margin-top: 10px; transition: transform 0.5s ease; }
 
-/* =========================
-CONFETTI
-========================= */
+.shake { animation: shake 0.5s; }
+@keyframes shake {
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-10px);}
+    75%{transform:translateX(10px);}
+}
+
+.options { margin-top: 30px; }
+
+.option-btn {
+    font-size: 3rem;
+    width: 120px;
+    height: 120px;
+    border-radius: 25px;
+}
+
+#topBar { position: absolute; top: 10px; right: 10px; }
+#gear { cursor: pointer; font-size: 1.8rem; margin-left: 10px; }
+
 .confetti {
-position: absolute;
-width: 10px;
-height: 10px;
-background: red;
-animation: fall 3s linear forwards;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: fall 3s linear forwards;
 }
 @keyframes fall {
-to { transform: translateY(100vh); opacity: 0; }
-} </style>
-
+    to { transform: translateY(100vh); opacity: 0; }
+}
+</style>
 </head>
 <body>
 
@@ -119,11 +77,10 @@ to { transform: translateY(100vh); opacity: 0; }
     <span id="gear">⚙</span>
 </div>
 
-<!-- SETUP SCREEN -->
-
+<!-- SETUP -->
 <div id="setupScreen" class="screen">
     <h1 id="title"></h1>
-    <input type="text" id="playerName" placeholder="">
+    <input type="text" id="playerName">
     <div>
         <span class="avatar" id="boy">👦</span>
         <span class="avatar" id="girl">👧</span>
@@ -131,230 +88,189 @@ to { transform: translateY(100vh); opacity: 0; }
     <button id="startBtn"></button>
 </div>
 
-<!-- STORY SCREEN -->
-
+<!-- STORY -->
 <div id="storyScreen" class="screen hidden">
     <div class="balloon">🎈</div>
-    <p id="storyText" style="font-size:1.5rem;margin-top:20px;"></p>
+    <p id="storyText" style="font-size:1.6rem;margin-top:20px;"></p>
     <button id="continueBtn"></button>
 </div>
 
-<!-- GAME SCREEN -->
-
+<!-- GAME -->
 <div id="gameScreen" class="screen hidden">
     <h2 id="captainLabel"></h2>
+    <div id="weatherDisplay" style="font-size:5rem;margin:20px;"></div>
     <div class="balloon" id="gameBalloon">🎈</div>
-    <div id="feedback" style="font-size:1.5rem;margin:10px;"></div>
-    <div class="match-container" id="matchContainer"></div>
+    <h2 id="questionText"></h2>
+    <div class="options" id="optionsContainer"></div>
+    <h2 id="feedback"></h2>
 </div>
 
-<!-- WIN SCREEN -->
-
+<!-- WIN -->
 <div id="winScreen" class="screen hidden">
     <h1 id="winMessage"></h1>
     <button onclick="location.reload()">Restart</button>
 </div>
 
 <script>
-/* =========================
-   TRANSLATIONS
-========================= */
-const translations = {
-    ro: {
-        title: "Aventura cu Balonul",
-        placeholder: "Numele tău",
-        start: "Începe aventura",
-        continue: "Continuă",
-        tryAgain: "Mai încearcă!",
-        good: "Bravo!",
-        win: "Ai ajuns la destinație!",
-        captain: "Căpitanul"
-    },
-    en: {
-        title: "Balloon Adventure",
-        placeholder: "Your name",
-        start: "Start Adventure",
-        continue: "Continue",
-        tryAgain: "Let's try again!",
-        good: "Great job!",
-        win: "You reached the destination!",
-        captain: "Captain"
-    }
+const T = {
+ro:{
+title:"Aventura cu Balonul",
+placeholder:"Numele tău",
+start:"Începe aventura",
+continue:"Continuă",
+question:"Ce ajută balonul acum?",
+good:"Bravo!",
+tryAgain:"Mai încearcă!",
+win:"Ai ajuns la destinație!",
+captain:"Căpitanul"
+},
+en:{
+title:"Balloon Adventure",
+placeholder:"Your name",
+start:"Start Adventure",
+continue:"Continue",
+question:"What helps the balloon now?",
+good:"Great job!",
+tryAgain:"Let's try again!",
+win:"You reached the destination!",
+captain:"Captain"
+}
 };
-let lang = "ro";
 
-/* =========================
-   GAME STATE
-========================= */
-let player = { name: "", avatar: "" };
-let correctMatches = 0;
-let selectedWeather = null;
-let requiredMatches = 5;
+let lang="ro";
+let player={name:"",avatar:""};
+let currentRound=0;
+let requiredRounds=parseInt(localStorage.getItem("rounds"))||5;
+let soundEnabled=localStorage.getItem("sound")!=="false";
 
-/* =========================
-   STORY
-========================= */
-let storyLines = [];
-let storyIndex = 0;
-
-function buildStory() {
-    storyLines = [
-        `${translations[lang].captain} ${player.name} ${player.avatar} urcă în balonul magic.`,
-        "Vântul începe să sufle ușor...",
-        "Nori apar la orizont...",
-        "Alege vremea potrivită pentru a continua aventura!"
-    ];
-}
-
-function showStory() {
-    buildStory();
-    document.getElementById("storyScreen").classList.remove("hidden");
-    typeStory();
-}
-
-function typeStory() {
-    if (storyIndex < storyLines.length) {
-        document.getElementById("storyText").innerText = storyLines[storyIndex];
-        storyIndex++;
-    } else {
-        document.getElementById("storyScreen").classList.add("hidden");
-        startGame();
-    }
-}
-
-/* =========================
-   GAME LOGIC
-========================= */
-const pairs = [
-    { a: "☀️", b: "🔥" },
-    { a: "🌧️", b: "☂️" },
-    { a: "❄️", b: "🧥" },
-    { a: "💨", b: "🪁" },
-    { a: "⛈️", b: "🏠" }
+const rounds=[
+{weather:"☀️",correct:"👓",options:["👓","☂️","🪁"]},
+{weather:"🌧️",correct:"☂️",options:["☂️","👓","🪁"]},
+{weather:"❄️",correct:"🧥",options:["🧥","☂️","👓"]},
+{weather:"💨",correct:"🪁",options:["🪁","🧥","👓"]},
+{weather:"🌫️",correct:"🔦",options:["🔦","👓","🧥"]},
+{weather:"🌤️",correct:"🎈",options:["🎈","🪁","👓"]}
 ];
 
-function startGame() {
-    document.getElementById("gameScreen").classList.remove("hidden");
-    document.getElementById("captainLabel").innerText =
-        `${translations[lang].captain} ${player.name}`;
-    loadCards();
+function updateLang(){
+document.getElementById("title").innerText=T[lang].title;
+document.getElementById("playerName").placeholder=T[lang].placeholder;
+document.getElementById("startBtn").innerText=T[lang].start;
+document.getElementById("continueBtn").innerText=T[lang].continue;
+document.getElementById("languageToggle").innerText=lang.toUpperCase();
 }
-
-function loadCards() {
-    const container = document.getElementById("matchContainer");
-    container.innerHTML = "";
-    pairs.slice(0, requiredMatches).forEach(pair => {
-        [pair.a, pair.b].forEach(symbol => {
-            const div = document.createElement("div");
-            div.className = "card";
-            div.innerText = symbol;
-            div.onclick = () => selectCard(symbol);
-            container.appendChild(div);
-        });
-    });
-}
-
-function selectCard(symbol) {
-    if (!selectedWeather) {
-        selectedWeather = symbol;
-    } else {
-        checkMatch(selectedWeather, symbol);
-        selectedWeather = null;
-    }
-}
-
-function checkMatch(a, b) {
-    const match = pairs.find(p =>
-        (p.a === a && p.b === b) || (p.a === b && p.b === a)
-    );
-    if (match) {
-        correctMatches++;
-        document.getElementById("feedback").innerText = translations[lang].good;
-        animateBalloon();
-        if (correctMatches >= requiredMatches) winGame();
-    } else {
-        document.getElementById("feedback").innerText = translations[lang].tryAgain;
-    }
-}
-
-function animateBalloon() {
-    const balloon = document.getElementById("gameBalloon");
-    balloon.style.transform = `translateY(-${correctMatches * 20}px)`;
-}
-
-function winGame() {
-    document.getElementById("gameScreen").classList.add("hidden");
-    document.getElementById("winScreen").classList.remove("hidden");
-    document.getElementById("winMessage").innerText = translations[lang].win;
-    launchConfetti();
-}
-
-/* =========================
-   CONFETTI
-========================= */
-function launchConfetti() {
-    for (let i = 0; i < 50; i++) {
-        const div = document.createElement("div");
-        div.className = "confetti";
-        div.style.left = Math.random() * 100 + "vw";
-        div.style.background = `hsl(${Math.random()*360},100%,50%)`;
-        document.body.appendChild(div);
-        setTimeout(() => div.remove(), 3000);
-    }
-}
-
-/* =========================
-   SETTINGS
-========================= */
-document.getElementById("gear").onclick = () => {
-    const pass = prompt("Password:");
-    if (pass === "1234") {
-        const newMatches = prompt("Number of matches (3-8):", requiredMatches);
-        requiredMatches = Math.min(8, Math.max(3, parseInt(newMatches)));
-        localStorage.setItem("matches", requiredMatches);
-    }
-};
-requiredMatches = parseInt(localStorage.getItem("matches")) || 5;
-
-/* =========================
-   LANGUAGE SWITCH
-========================= */
-function updateLanguage() {
-    document.getElementById("title").innerText = translations[lang].title;
-    document.getElementById("playerName").placeholder = translations[lang].placeholder;
-    document.getElementById("startBtn").innerText = translations[lang].start;
-    document.getElementById("continueBtn").innerText = translations[lang].continue;
-    document.getElementById("languageToggle").innerText = lang.toUpperCase();
-}
-document.getElementById("languageToggle").onclick = () => {
-    lang = lang === "ro" ? "en" : "ro";
-    updateLanguage();
+document.getElementById("languageToggle").onclick=()=>{
+lang=lang==="ro"?"en":"ro";
+updateLang();
 };
 
-/* =========================
-   SETUP EVENTS
-========================= */
-document.getElementById("boy").onclick = function() {
-    player.avatar = "👦";
-    this.classList.add("selected");
-    document.getElementById("girl").classList.remove("selected");
-};
-document.getElementById("girl").onclick = function() {
-    player.avatar = "👧";
-    this.classList.add("selected");
-    document.getElementById("boy").classList.remove("selected");
+let storyLines=[];
+let storyIndex=0;
+
+function buildStory(){
+storyLines=[
+`${T[lang].captain} ${player.name} ${player.avatar} urcă în balonul magic.`,
+"Balonul plutește peste munți și orașe.",
+"Dar vremea se schimbă mereu!",
+"Ajută balonul să zboare în siguranță!"
+];
+}
+function showStory(){
+buildStory();
+document.getElementById("storyScreen").classList.remove("hidden");
+typeStory();
+}
+function typeStory(){
+if(storyIndex<storyLines.length){
+document.getElementById("storyText").innerText=storyLines[storyIndex++];
+}else{
+document.getElementById("storyScreen").classList.add("hidden");
+startGame();
+}
+}
+
+function startGame(){
+document.getElementById("gameScreen").classList.remove("hidden");
+document.getElementById("captainLabel").innerText=`${T[lang].captain} ${player.name}`;
+loadRound();
+}
+function loadRound(){
+if(currentRound>=requiredRounds){winGame();return;}
+let round=rounds[currentRound];
+document.getElementById("weatherDisplay").innerText=round.weather;
+document.getElementById("questionText").innerText=T[lang].question;
+let container=document.getElementById("optionsContainer");
+container.innerHTML="";
+round.options.sort(()=>Math.random()-0.5);
+round.options.forEach(opt=>{
+let btn=document.createElement("button");
+btn.className="option-btn";
+btn.innerText=opt;
+btn.onclick=()=>checkAnswer(opt);
+container.appendChild(btn);
+});
+}
+function checkAnswer(choice){
+let round=rounds[currentRound];
+if(choice===round.correct){
+currentRound++;
+document.getElementById("feedback").innerText=T[lang].good;
+moveBalloon();
+setTimeout(loadRound,800);
+}else{
+document.getElementById("feedback").innerText=T[lang].tryAgain;
+document.getElementById("gameBalloon").classList.add("shake");
+setTimeout(()=>document.getElementById("gameBalloon").classList.remove("shake"),500);
+}
+}
+function moveBalloon(){
+let balloon=document.getElementById("gameBalloon");
+balloon.style.transform=`translateY(-${currentRound*25}px)`;
+}
+function winGame(){
+document.getElementById("gameScreen").classList.add("hidden");
+document.getElementById("winScreen").classList.remove("hidden");
+document.getElementById("winMessage").innerText=T[lang].win;
+launchConfetti();
+}
+function launchConfetti(){
+for(let i=0;i<60;i++){
+let div=document.createElement("div");
+div.className="confetti";
+div.style.left=Math.random()*100+"vw";
+div.style.background=`hsl(${Math.random()*360},100%,50%)`;
+document.body.appendChild(div);
+setTimeout(()=>div.remove(),3000);
+}
+}
+
+document.getElementById("gear").onclick=()=>{
+let pass=prompt("Password:");
+if(pass==="1234"){
+let r=prompt("Rounds (3-6):",requiredRounds);
+requiredRounds=Math.min(6,Math.max(3,parseInt(r)));
+localStorage.setItem("rounds",requiredRounds);
+}
 };
 
-document.getElementById("startBtn").onclick = () => {
-    player.name = document.getElementById("playerName").value || "Explorer";
-    document.getElementById("setupScreen").classList.add("hidden");
-    showStory();
+document.getElementById("boy").onclick=function(){
+player.avatar="👦";
+this.classList.add("selected");
+girl.classList.remove("selected");
 };
+document.getElementById("girl").onclick=function(){
+player.avatar="👧";
+this.classList.add("selected");
+boy.classList.remove("selected");
+};
+document.getElementById("startBtn").onclick=()=>{
+player.name=document.getElementById("playerName").value||"Explorer";
+document.getElementById("setupScreen").classList.add("hidden");
+showStory();
+};
+document.getElementById("continueBtn").onclick=typeStory;
 
-document.getElementById("continueBtn").onclick = typeStory;
-
-updateLanguage();
+updateLang();
 </script>
-
 </body>
 </html>

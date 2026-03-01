@@ -6,68 +6,80 @@
 <title>Hot Air Balloon Adventure</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Comic Sans MS', Arial, sans-serif; }
-body { background: linear-gradient(#87CEEB, #E6F7FF); overflow: hidden; }
+body { background: linear-gradient(#87CEEB, #E6F7FF); overflow: hidden; height: 100vh; }
 .hidden { display: none; }
-.screen { width: 100vw; height: 100vh; padding: 20px; text-align: center; }
-h1 { font-size: 2.5rem; margin-bottom: 20px; }
-h2 { font-size: 1.8rem; margin: 10px 0; }
+.screen { width: 100vw; height: 100vh; padding: 20px; text-align: center; position: relative; }
+h1 { font-size: 2.5rem; margin-bottom: 20px; color: #2c3e50; }
+h2 { font-size: 1.8rem; margin: 10px 0; color: #34495e; }
 
+/* Buttons & Inputs */
 button {
-    font-size: 1.4rem;
-    padding: 15px 25px;
-    border-radius: 25px;
-    border: none;
-    margin: 10px;
-    cursor: pointer;
-    background: #FFD54F;
-    box-shadow: 0 5px 12px rgba(0,0,0,0.2);
-    transition: transform 0.2s;
+    font-size: 1.4rem; padding: 15px 25px; border-radius: 25px; border: none;
+    margin: 10px; cursor: pointer; background: #FFD54F;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.2); transition: transform 0.2s;
 }
 button:hover { transform: scale(1.08); }
-
 input {
-    font-size: 1.3rem;
-    padding: 12px;
-    border-radius: 20px;
-    border: 2px solid #ccc;
-    margin: 10px;
-    width: 220px;
-    text-align: center;
+    font-size: 1.3rem; padding: 12px; border-radius: 20px; border: 2px solid #ccc;
+    margin: 10px; width: 220px; text-align: center;
 }
 
-.avatar { font-size: 3.5rem; cursor: pointer; margin: 10px; }
-.selected { border: 4px solid #FF5722; border-radius: 20px; padding: 5px; }
+/* Character Selection */
+.avatar { font-size: 3.5rem; cursor: pointer; margin: 10px; display: inline-block; padding: 10px; }
+.selected { border: 4px solid #FF5722; border-radius: 20px; background: white; }
 
-.balloon { font-size: 5rem; margin-top: 10px; transition: transform 0.5s ease; }
+/* Layout Split for Game */
+.game-container {
+    display: flex; justify-content: space-around; align-items: center;
+    height: 300px; margin-top: 20px;
+}
+.weather-zone { flex: 1; font-size: 8rem; }
+.balloon-zone { flex: 1; position: relative; height: 100%; }
 
+/* Detailed CSS Balloon */
+.hot-air-balloon {
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    transition: bottom 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.balloon-top {
+    width: 100px; height: 120px; background: #FF5722;
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    position: relative; box-shadow: inset -10px -10px rgba(0,0,0,0.1);
+}
+.balloon-top::after {
+    content: ""; position: absolute; width: 100%; height: 100%;
+    left: 0; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    background: repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(255,255,255,0.3) 20px, rgba(255,255,255,0.3) 40px);
+}
+.basket {
+    width: 40px; height: 30px; background: #8D6E63; margin: 20px auto 0;
+    border-radius: 5px; position: relative; border-bottom: 5px solid #5D4037;
+}
+.basket::before, .basket::after {
+    content: ""; position: absolute; top: -20px; width: 2px; height: 20px; background: #555;
+}
+.basket::before { left: 5px; } .basket::after { right: 5px; }
+.pilot { position: absolute; top: -25px; left: 5px; font-size: 1.8rem; }
+
+/* Animations */
 .shake { animation: shake 0.5s; }
 @keyframes shake {
-    0%,100%{transform:translateX(0);}
-    25%{transform:translateX(-10px);}
-    75%{transform:translateX(10px);}
+    0%,100%{transform:translateX(-50%);}
+    25%{transform:translateX(-60%);}
+    75%{transform:translateX(-40%);}
 }
 
-.options { margin-top: 30px; }
+.options { margin-top: 20px; }
+.option-btn { font-size: 3.5rem; width: 100px; height: 100px; }
 
-.option-btn {
-    font-size: 3rem;
-    width: 120px;
-    height: 120px;
-    border-radius: 25px;
-}
-
-#topBar { position: absolute; top: 10px; right: 10px; }
+#topBar { position: absolute; top: 10px; right: 10px; z-index: 10; }
 #gear { cursor: pointer; font-size: 1.8rem; margin-left: 10px; }
 
 .confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
+    position: absolute; width: 10px; height: 10px;
     animation: fall 3s linear forwards;
 }
-@keyframes fall {
-    to { transform: translateY(100vh); opacity: 0; }
-}
+@keyframes fall { to { transform: translateY(100vh); opacity: 0; } }
 </style>
 </head>
 <body>
@@ -77,7 +89,6 @@ input {
     <span id="gear">⚙</span>
 </div>
 
-<!-- SETUP -->
 <div id="setupScreen" class="screen">
     <h1 id="title"></h1>
     <input type="text" id="playerName">
@@ -88,24 +99,35 @@ input {
     <button id="startBtn"></button>
 </div>
 
-<!-- STORY -->
 <div id="storyScreen" class="screen hidden">
-    <div class="balloon">🎈</div>
+    <div style="margin-top:50px;">
+        <div class="balloon-top" style="margin: 0 auto;"></div>
+        <div class="basket" style="margin: 20px auto;"></div>
+    </div>
     <p id="storyText" style="font-size:1.6rem;margin-top:20px;"></p>
     <button id="continueBtn"></button>
 </div>
 
-<!-- GAME -->
 <div id="gameScreen" class="screen hidden">
     <h2 id="captainLabel"></h2>
-    <div id="weatherDisplay" style="font-size:5rem;margin:20px;"></div>
-    <div class="balloon" id="gameBalloon">🎈</div>
+    
+    <div class="game-container">
+        <div class="weather-zone" id="weatherDisplay">☀️</div>
+        <div class="balloon-zone">
+            <div class="hot-air-balloon" id="gameBalloon">
+                <div class="balloon-top"></div>
+                <div class="basket">
+                    <div class="pilot" id="pilotAvatar">👦</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <h2 id="questionText"></h2>
     <div class="options" id="optionsContainer"></div>
     <h2 id="feedback"></h2>
 </div>
 
-<!-- WIN -->
 <div id="winScreen" class="screen hidden">
     <h1 id="winMessage"></h1>
     <button onclick="location.reload()">Restart</button>
@@ -113,160 +135,174 @@ input {
 
 <script>
 const T = {
-ro:{
-title:"Aventura cu Balonul",
-placeholder:"Numele tău",
-start:"Începe aventura",
-continue:"Continuă",
-question:"Ce ajută balonul acum?",
-good:"Bravo!",
-tryAgain:"Mai încearcă!",
-win:"Ai ajuns la destinație!",
-captain:"Căpitanul"
-},
-en:{
-title:"Balloon Adventure",
-placeholder:"Your name",
-start:"Start Adventure",
-continue:"Continue",
-question:"What helps the balloon now?",
-good:"Great job!",
-tryAgain:"Let's try again!",
-win:"You reached the destination!",
-captain:"Captain"
-}
+    ro:{
+        title:"Aventura cu Balonul",
+        placeholder:"Numele tău",
+        start:"Începe aventura",
+        continue:"Continuă",
+        question:"Ce ajută balonul acum?",
+        good:"Bravo!",
+        tryAgain:"Mai încearcă!",
+        win:"Ai ajuns la destinație!",
+        captain:"Căpitanul"
+    },
+    en:{
+        title:"Balloon Adventure",
+        placeholder:"Your name",
+        start:"Start Adventure",
+        continue:"Continue",
+        question:"What helps the balloon now?",
+        good:"Great job!",
+        tryAgain:"Let's try again!",
+        win:"You reached the destination!",
+        captain:"Captain"
+    }
 };
 
 let lang="ro";
-let player={name:"",avatar:""};
+let player={name:"Explorer",avatar:"👦"};
 let currentRound=0;
 let requiredRounds=parseInt(localStorage.getItem("rounds"))||5;
-let soundEnabled=localStorage.getItem("sound")!=="false";
 
 const rounds=[
-{weather:"☀️",correct:"👓",options:["👓","☂️","🪁"]},
-{weather:"🌧️",correct:"☂️",options:["☂️","👓","🪁"]},
-{weather:"❄️",correct:"🧥",options:["🧥","☂️","👓"]},
-{weather:"💨",correct:"🪁",options:["🪁","🧥","👓"]},
-{weather:"🌫️",correct:"🔦",options:["🔦","👓","🧥"]},
-{weather:"🌤️",correct:"🎈",options:["🎈","🪁","👓"]}
+    {weather:"☀️",correct:"👓",options:["👓","☂️","🪁"]},
+    {weather:"🌧️",correct:"☂️",options:["☂️","👓","🪁"]},
+    {weather:"❄️",correct:"🧤",options:["🧤","☂️","👓"]}, // Changed to gloves
+    {weather:"💨",correct:"🪁",options:["🪁","🧤","👓"]},
+    {weather:"🌫️",correct:"🔦",options:["🔦","👓","🧤"]},
+    {weather:"🌤️",correct:"🎈",options:["🎈","🪁","👓"]}
 ];
 
 function updateLang(){
-document.getElementById("title").innerText=T[lang].title;
-document.getElementById("playerName").placeholder=T[lang].placeholder;
-document.getElementById("startBtn").innerText=T[lang].start;
-document.getElementById("continueBtn").innerText=T[lang].continue;
-document.getElementById("languageToggle").innerText=lang.toUpperCase();
+    document.getElementById("title").innerText=T[lang].title;
+    document.getElementById("playerName").placeholder=T[lang].placeholder;
+    document.getElementById("startBtn").innerText=T[lang].start;
+    document.getElementById("continueBtn").innerText=T[lang].continue;
+    document.getElementById("languageToggle").innerText=lang.toUpperCase();
 }
+
 document.getElementById("languageToggle").onclick=()=>{
-lang=lang==="ro"?"en":"ro";
-updateLang();
+    lang=lang==="ro"?"en":"ro";
+    updateLang();
 };
 
 let storyLines=[];
 let storyIndex=0;
 
 function buildStory(){
-storyLines=[
-`${T[lang].captain} ${player.name} ${player.avatar} urcă în balonul magic.`,
-"Balonul plutește peste munți și orașe.",
-"Dar vremea se schimbă mereu!",
-"Ajută balonul să zboare în siguranță!"
-];
+    storyLines=[
+        `${T[lang].captain} ${player.name} ${player.avatar} urcă în balon.`,
+        "Balonul plutește peste munți!",
+        "Dar vremea se schimbă mereu...",
+        "Ajută balonul să zboare în siguranță!"
+    ];
 }
+
 function showStory(){
-buildStory();
-document.getElementById("storyScreen").classList.remove("hidden");
-typeStory();
+    buildStory();
+    document.getElementById("storyScreen").classList.remove("hidden");
+    typeStory();
 }
+
 function typeStory(){
-if(storyIndex<storyLines.length){
-document.getElementById("storyText").innerText=storyLines[storyIndex++];
-}else{
-document.getElementById("storyScreen").classList.add("hidden");
-startGame();
-}
+    if(storyIndex<storyLines.length){
+        document.getElementById("storyText").innerText=storyLines[storyIndex++];
+    }else{
+        document.getElementById("storyScreen").classList.add("hidden");
+        startGame();
+    }
 }
 
 function startGame(){
-document.getElementById("gameScreen").classList.remove("hidden");
-document.getElementById("captainLabel").innerText=`${T[lang].captain} ${player.name}`;
-loadRound();
+    document.getElementById("gameScreen").classList.remove("hidden");
+    document.getElementById("captainLabel").innerText=`${T[lang].captain} ${player.name}`;
+    document.getElementById("pilotAvatar").innerText = player.avatar;
+    loadRound();
 }
+
 function loadRound(){
-if(currentRound>=requiredRounds){winGame();return;}
-let round=rounds[currentRound];
-document.getElementById("weatherDisplay").innerText=round.weather;
-document.getElementById("questionText").innerText=T[lang].question;
-let container=document.getElementById("optionsContainer");
-container.innerHTML="";
-round.options.sort(()=>Math.random()-0.5);
-round.options.forEach(opt=>{
-let btn=document.createElement("button");
-btn.className="option-btn";
-btn.innerText=opt;
-btn.onclick=()=>checkAnswer(opt);
-container.appendChild(btn);
-});
+    if(currentRound>=requiredRounds){winGame();return;}
+    let round=rounds[currentRound % rounds.length];
+    document.getElementById("weatherDisplay").innerText=round.weather;
+    document.getElementById("questionText").innerText=T[lang].question;
+    let container=document.getElementById("optionsContainer");
+    container.innerHTML="";
+    
+    let shuffled = [...round.options].sort(()=>Math.random()-0.5);
+    shuffled.forEach(opt=>{
+        let btn=document.createElement("button");
+        btn.className="option-btn";
+        btn.innerText=opt;
+        btn.onclick=()=>checkAnswer(opt);
+        container.appendChild(btn);
+    });
 }
+
 function checkAnswer(choice){
-let round=rounds[currentRound];
-if(choice===round.correct){
-currentRound++;
-document.getElementById("feedback").innerText=T[lang].good;
-moveBalloon();
-setTimeout(loadRound,800);
-}else{
-document.getElementById("feedback").innerText=T[lang].tryAgain;
-document.getElementById("gameBalloon").classList.add("shake");
-setTimeout(()=>document.getElementById("gameBalloon").classList.remove("shake"),500);
+    let round=rounds[currentRound % rounds.length];
+    if(choice===round.correct){
+        currentRound++;
+        document.getElementById("feedback").innerText=T[lang].good;
+        moveBalloon();
+        setTimeout(() => {
+            document.getElementById("feedback").innerText="";
+            loadRound();
+        }, 1000);
+    }else{
+        document.getElementById("feedback").innerText=T[lang].tryAgain;
+        document.getElementById("gameBalloon").classList.add("shake");
+        setTimeout(()=>document.getElementById("gameBalloon").classList.remove("shake"),500);
+    }
 }
-}
+
 function moveBalloon(){
-let balloon=document.getElementById("gameBalloon");
-balloon.style.transform=`translateY(-${currentRound*25}px)`;
+    let balloon=document.getElementById("gameBalloon");
+    // Moves upward as levels progress
+    let height = (currentRound / requiredRounds) * 200; 
+    balloon.style.bottom=`${height}px`;
 }
+
 function winGame(){
-document.getElementById("gameScreen").classList.add("hidden");
-document.getElementById("winScreen").classList.remove("hidden");
-document.getElementById("winMessage").innerText=T[lang].win;
-launchConfetti();
+    document.getElementById("gameScreen").classList.add("hidden");
+    document.getElementById("winScreen").classList.remove("hidden");
+    document.getElementById("winMessage").innerText=T[lang].win;
+    launchConfetti();
 }
+
 function launchConfetti(){
-for(let i=0;i<60;i++){
-let div=document.createElement("div");
-div.className="confetti";
-div.style.left=Math.random()*100+"vw";
-div.style.background=`hsl(${Math.random()*360},100%,50%)`;
-document.body.appendChild(div);
-setTimeout(()=>div.remove(),3000);
-}
+    for(let i=0;i<60;i++){
+        let div=document.createElement("div");
+        div.className="confetti";
+        div.style.left=Math.random()*100+"vw";
+        div.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        document.body.appendChild(div);
+        setTimeout(()=>div.remove(),3000);
+    }
 }
 
 document.getElementById("gear").onclick=()=>{
-let pass=prompt("Password:");
-if(pass==="1234"){
-let r=prompt("Rounds (3-6):",requiredRounds);
-requiredRounds=Math.min(6,Math.max(3,parseInt(r)));
-localStorage.setItem("rounds",requiredRounds);
-}
+    let pass=prompt("Password:");
+    if(pass==="1234"){
+        let r=prompt("Rounds (3-6):",requiredRounds);
+        requiredRounds=Math.min(6,Math.max(3,parseInt(r)));
+        localStorage.setItem("rounds",requiredRounds);
+    }
 };
 
 document.getElementById("boy").onclick=function(){
-player.avatar="👦";
-this.classList.add("selected");
-girl.classList.remove("selected");
+    player.avatar="👦";
+    this.classList.add("selected");
+    document.getElementById("girl").classList.remove("selected");
 };
 document.getElementById("girl").onclick=function(){
-player.avatar="👧";
-this.classList.add("selected");
-boy.classList.remove("selected");
+    player.avatar="👧";
+    this.classList.add("selected");
+    document.getElementById("boy").classList.remove("selected");
 };
 document.getElementById("startBtn").onclick=()=>{
-player.name=document.getElementById("playerName").value||"Explorer";
-document.getElementById("setupScreen").classList.add("hidden");
-showStory();
+    player.name=document.getElementById("playerName").value||"Explorer";
+    document.getElementById("setupScreen").classList.add("hidden");
+    showStory();
 };
 document.getElementById("continueBtn").onclick=typeStory;
 

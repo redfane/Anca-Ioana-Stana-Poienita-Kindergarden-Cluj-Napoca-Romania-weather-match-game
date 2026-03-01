@@ -31,7 +31,7 @@ input {
 /* Layout Split: Weather Center, Balloon Right */
 .game-container {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr; /* Left (empty), Center (weather), Right (balloon) */
+    grid-template-columns: 1fr 2fr 1fr;
     align-items: center;
     height: 350px;
     margin-top: 20px;
@@ -52,26 +52,19 @@ input {
     box-shadow: inset -15px -15px 20px rgba(0,0,0,0.2), 0 10px 15px rgba(0,0,0,0.1);
     border: 2px solid #d84315;
 }
-/* Vertical Stripes for detail */
 .balloon-top::before {
     content: ""; position: absolute; width: 40px; height: 100%;
     left: 40px; background: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
 }
-/* Rigging (Ropes) */
-.ropes {
-    position: absolute; top: 130px; left: 20px; width: 80px; height: 40px;
-}
-.rope {
-    position: absolute; width: 2px; height: 35px; background: #795548;
-    top: 0;
-}
+.ropes { position: absolute; top: 130px; left: 20px; width: 80px; height: 40px; }
+.rope { position: absolute; width: 2px; height: 35px; background: #795548; top: 0; }
 .rope-1 { left: 10px; transform: rotate(10deg); }
 .rope-2 { right: 10px; transform: rotate(-10deg); }
 
 .basket {
     width: 55px; height: 45px; 
-    background: #8d6e63; /* Wicker color */
+    background: #8d6e63;
     background-image: repeating-linear-gradient(0deg, transparent, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 10px),
                       repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 10px);
     margin: 30px auto 0;
@@ -130,7 +123,6 @@ input {
 
 <div id="gameScreen" class="screen hidden">
     <h2 id="captainLabel"></h2>
-    
     <div class="game-container">
         <div class="weather-zone" id="weatherDisplay">☀️</div>
         <div class="balloon-zone">
@@ -146,7 +138,6 @@ input {
             </div>
         </div>
     </div>
-
     <h2 id="questionText"></h2>
     <div class="options" id="optionsContainer"></div>
     <h2 id="feedback" style="height: 40px; margin-top: 10px;"></h2>
@@ -196,8 +187,9 @@ let lang="ro";
 let player={name:"Explorer",avatar:"👦"};
 let currentRound=0;
 let requiredRounds=parseInt(localStorage.getItem("rounds"))||5;
+let activeRounds = []; // This will hold the shuffled sequence
 
-const rounds=[
+const masterRounds=[
     {weather:"☀️",correct:"👓",options:["👓","☂️","🪁"]},
     {weather:"🌧️",correct:"☂️",options:["☂️","👓","🪁"]},
     {weather:"❄️",correct:"🧤",options:["🧤","☂️","👓"]},
@@ -217,23 +209,15 @@ function updateLang(){
 document.getElementById("languageToggle").onclick=()=>{
     lang=lang==="ro"?"en":"ro";
     updateLang();
-    // Refresh story text immediately if visible
     if(!document.getElementById("storyScreen").classList.contains("hidden")) {
-        storyIndex--; // Step back one so we re-show current line in new lang
+        storyIndex--; 
         typeStory();
     }
 };
 
 let storyIndex=0;
-
 function typeStory(){
-    const lines = [
-        T[lang].s1(player.name),
-        T[lang].s2,
-        T[lang].s3,
-        T[lang].s4
-    ];
-
+    const lines = [T[lang].s1(player.name), T[lang].s2, T[lang].s3, T[lang].s4];
     if(storyIndex < lines.length){
         document.getElementById("storyText").innerText = lines[storyIndex++];
     } else {
@@ -243,6 +227,9 @@ function typeStory(){
 }
 
 function startGame(){
+    // SHUFFLE THE MATCHES HERE
+    activeRounds = [...masterRounds].sort(() => Math.random() - 0.5);
+    
     document.getElementById("gameScreen").classList.remove("hidden");
     document.getElementById("captainLabel").innerText=`${T[lang].captain} ${player.name}`;
     document.getElementById("pilotAvatar").innerText = player.avatar;
@@ -251,14 +238,17 @@ function startGame(){
 
 function loadRound(){
     if(currentRound >= requiredRounds){winGame(); return;}
-    let round = rounds[currentRound % rounds.length];
+    
+    // Get the current round from our shuffled deck
+    let round = activeRounds[currentRound % activeRounds.length];
+    
     document.getElementById("weatherDisplay").innerText = round.weather;
     document.getElementById("questionText").innerText = T[lang].question;
     let container = document.getElementById("optionsContainer");
     container.innerHTML = "";
     
-    let shuffled = [...round.options].sort(()=>Math.random()-0.5);
-    shuffled.forEach(opt=>{
+    let shuffledOptions = [...round.options].sort(()=>Math.random()-0.5);
+    shuffledOptions.forEach(opt=>{
         let btn = document.createElement("button");
         btn.className = "option-btn";
         btn.innerText = opt;
@@ -268,7 +258,7 @@ function loadRound(){
 }
 
 function checkAnswer(choice){
-    let round = rounds[currentRound % rounds.length];
+    let round = activeRounds[currentRound % activeRounds.length];
     if(choice === round.correct){
         currentRound++;
         document.getElementById("feedback").innerText = T[lang].good;
@@ -288,7 +278,6 @@ function checkAnswer(choice){
 
 function moveBalloon(){
     let balloon = document.getElementById("gameBalloon");
-    // Calculate height based on total rounds
     let step = 250 / requiredRounds;
     balloon.style.bottom = `${currentRound * step}px`;
 }

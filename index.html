@@ -9,7 +9,7 @@
 body { background: linear-gradient(#87CEEB, #E6F7FF); overflow: hidden; height: 100vh; }
 .hidden { display: none; }
 .screen { width: 100vw; height: 100vh; padding: 20px; text-align: center; position: relative; }
-h1 { font-size: 2.5rem; margin-bottom: 20px; color: #2c3e50; }
+h1 { font-size: 2.5rem; margin-bottom: 20px; color: #2c3e50; text-shadow: 1px 1px white; }
 h2 { font-size: 1.8rem; margin: 10px 0; color: #34495e; }
 
 /* Buttons & Inputs */
@@ -25,55 +25,75 @@ input {
 }
 
 /* Character Selection */
-.avatar { font-size: 3.5rem; cursor: pointer; margin: 10px; display: inline-block; padding: 10px; }
-.selected { border: 4px solid #FF5722; border-radius: 20px; background: white; }
+.avatar { font-size: 3.5rem; cursor: pointer; margin: 10px; display: inline-block; padding: 10px; transition: 0.3s; }
+.selected { border: 4px solid #FF5722; border-radius: 20px; background: white; transform: translateY(-5px); }
 
-/* Layout Split for Game */
+/* Layout Split: Weather Center, Balloon Right */
 .game-container {
-    display: flex; justify-content: space-around; align-items: center;
-    height: 300px; margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; /* Left (empty), Center (weather), Right (balloon) */
+    align-items: center;
+    height: 350px;
+    margin-top: 20px;
 }
-.weather-zone { flex: 1; font-size: 8rem; }
-.balloon-zone { flex: 1; position: relative; height: 100%; }
+.weather-zone { grid-column: 2; font-size: 10rem; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
+.balloon-zone { grid-column: 3; position: relative; height: 100%; width: 100%; }
 
-/* Detailed CSS Balloon */
+/* --- Detailed CSS Balloon --- */
 .hot-air-balloon {
-    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    transition: bottom 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute; bottom: 0; right: 40px;
+    transition: bottom 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .balloon-top {
-    width: 100px; height: 120px; background: #FF5722;
+    width: 120px; height: 140px; 
+    background: radial-gradient(circle at 30% 30%, #ff7043, #e64a19);
     border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-    position: relative; box-shadow: inset -10px -10px rgba(0,0,0,0.1);
+    position: relative;
+    box-shadow: inset -15px -15px 20px rgba(0,0,0,0.2), 0 10px 15px rgba(0,0,0,0.1);
+    border: 2px solid #d84315;
 }
-.balloon-top::after {
-    content: ""; position: absolute; width: 100%; height: 100%;
-    left: 0; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-    background: repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(255,255,255,0.3) 20px, rgba(255,255,255,0.3) 40px);
+/* Vertical Stripes for detail */
+.balloon-top::before {
+    content: ""; position: absolute; width: 40px; height: 100%;
+    left: 40px; background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
 }
+/* Rigging (Ropes) */
+.ropes {
+    position: absolute; top: 130px; left: 20px; width: 80px; height: 40px;
+}
+.rope {
+    position: absolute; width: 2px; height: 35px; background: #795548;
+    top: 0;
+}
+.rope-1 { left: 10px; transform: rotate(10deg); }
+.rope-2 { right: 10px; transform: rotate(-10deg); }
+
 .basket {
-    width: 40px; height: 30px; background: #8D6E63; margin: 20px auto 0;
-    border-radius: 5px; position: relative; border-bottom: 5px solid #5D4037;
+    width: 55px; height: 45px; 
+    background: #8d6e63; /* Wicker color */
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 10px),
+                      repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 10px);
+    margin: 30px auto 0;
+    border-radius: 8px; position: relative;
+    border: 3px solid #5d4037;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
-.basket::before, .basket::after {
-    content: ""; position: absolute; top: -20px; width: 2px; height: 20px; background: #555;
-}
-.basket::before { left: 5px; } .basket::after { right: 5px; }
-.pilot { position: absolute; top: -25px; left: 5px; font-size: 1.8rem; }
+.pilot { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); font-size: 2.2rem; }
 
 /* Animations */
 .shake { animation: shake 0.5s; }
 @keyframes shake {
-    0%,100%{transform:translateX(-50%);}
-    25%{transform:translateX(-60%);}
-    75%{transform:translateX(-40%);}
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-15px);}
+    75%{transform:translateX(15px);}
 }
 
-.options { margin-top: 20px; }
-.option-btn { font-size: 3.5rem; width: 100px; height: 100px; }
+.options { margin-top: 30px; display: flex; justify-content: center; gap: 20px; }
+.option-btn { font-size: 4rem; width: 120px; height: 120px; background: white; border: 4px solid #FFD54F; }
 
-#topBar { position: absolute; top: 10px; right: 10px; z-index: 10; }
-#gear { cursor: pointer; font-size: 1.8rem; margin-left: 10px; }
+#topBar { position: absolute; top: 10px; right: 10px; z-index: 100; }
+#gear { cursor: pointer; font-size: 1.8rem; margin-left: 10px; vertical-align: middle; }
 
 .confetti {
     position: absolute; width: 10px; height: 10px;
@@ -91,7 +111,7 @@ input {
 
 <div id="setupScreen" class="screen">
     <h1 id="title"></h1>
-    <input type="text" id="playerName">
+    <input type="text" id="playerName" maxlength="12">
     <div>
         <span class="avatar" id="boy">👦</span>
         <span class="avatar" id="girl">👧</span>
@@ -100,11 +120,11 @@ input {
 </div>
 
 <div id="storyScreen" class="screen hidden">
-    <div style="margin-top:50px;">
-        <div class="balloon-top" style="margin: 0 auto;"></div>
-        <div class="basket" style="margin: 20px auto;"></div>
+    <div style="margin: 40px auto; width: 120px;">
+        <div class="balloon-top"></div>
+        <div class="basket"></div>
     </div>
-    <p id="storyText" style="font-size:1.6rem;margin-top:20px;"></p>
+    <p id="storyText" style="font-size:1.8rem; font-weight: bold; min-height: 80px;"></p>
     <button id="continueBtn"></button>
 </div>
 
@@ -116,6 +136,10 @@ input {
         <div class="balloon-zone">
             <div class="hot-air-balloon" id="gameBalloon">
                 <div class="balloon-top"></div>
+                <div class="ropes">
+                    <div class="rope rope-1"></div>
+                    <div class="rope rope-2"></div>
+                </div>
                 <div class="basket">
                     <div class="pilot" id="pilotAvatar">👦</div>
                 </div>
@@ -125,11 +149,12 @@ input {
 
     <h2 id="questionText"></h2>
     <div class="options" id="optionsContainer"></div>
-    <h2 id="feedback"></h2>
+    <h2 id="feedback" style="height: 40px; margin-top: 10px;"></h2>
 </div>
 
 <div id="winScreen" class="screen hidden">
     <h1 id="winMessage"></h1>
+    <div style="font-size: 10rem;">🏆</div>
     <button onclick="location.reload()">Restart</button>
 </div>
 
@@ -141,10 +166,14 @@ const T = {
         start:"Începe aventura",
         continue:"Continuă",
         question:"Ce ajută balonul acum?",
-        good:"Bravo!",
-        tryAgain:"Mai încearcă!",
+        good:"Bravo! ✨",
+        tryAgain:"Mai încearcă! ❌",
         win:"Ai ajuns la destinație!",
-        captain:"Căpitanul"
+        captain:"Căpitanul",
+        s1: (name) => `Căpitanul ${name} urcă în balonul magic.`,
+        s2: "Balonul plutește peste munți și orașe.",
+        s3: "Dar vremea se schimbă mereu!",
+        s4: "Ajută balonul să zboare în siguranță!"
     },
     en:{
         title:"Balloon Adventure",
@@ -152,10 +181,14 @@ const T = {
         start:"Start Adventure",
         continue:"Continue",
         question:"What helps the balloon now?",
-        good:"Great job!",
-        tryAgain:"Let's try again!",
+        good:"Great job! ✨",
+        tryAgain:"Let's try again! ❌",
         win:"You reached the destination!",
-        captain:"Captain"
+        captain:"Captain",
+        s1: (name) => `Captain ${name} climbs into the magic balloon.`,
+        s2: "The balloon floats over mountains and cities.",
+        s3: "But the weather is always changing!",
+        s4: "Help the balloon fly safely!"
     }
 };
 
@@ -167,7 +200,7 @@ let requiredRounds=parseInt(localStorage.getItem("rounds"))||5;
 const rounds=[
     {weather:"☀️",correct:"👓",options:["👓","☂️","🪁"]},
     {weather:"🌧️",correct:"☂️",options:["☂️","👓","🪁"]},
-    {weather:"❄️",correct:"🧤",options:["🧤","☂️","👓"]}, // Changed to gloves
+    {weather:"❄️",correct:"🧤",options:["🧤","☂️","👓"]},
     {weather:"💨",correct:"🪁",options:["🪁","🧤","👓"]},
     {weather:"🌫️",correct:"🔦",options:["🔦","👓","🧤"]},
     {weather:"🌤️",correct:"🎈",options:["🎈","🪁","👓"]}
@@ -184,30 +217,26 @@ function updateLang(){
 document.getElementById("languageToggle").onclick=()=>{
     lang=lang==="ro"?"en":"ro";
     updateLang();
+    // Refresh story text immediately if visible
+    if(!document.getElementById("storyScreen").classList.contains("hidden")) {
+        storyIndex--; // Step back one so we re-show current line in new lang
+        typeStory();
+    }
 };
 
-let storyLines=[];
 let storyIndex=0;
 
-function buildStory(){
-    storyLines=[
-        `${T[lang].captain} ${player.name} ${player.avatar} urcă în balon.`,
-        "Balonul plutește peste munți!",
-        "Dar vremea se schimbă mereu...",
-        "Ajută balonul să zboare în siguranță!"
-    ];
-}
-
-function showStory(){
-    buildStory();
-    document.getElementById("storyScreen").classList.remove("hidden");
-    typeStory();
-}
-
 function typeStory(){
-    if(storyIndex<storyLines.length){
-        document.getElementById("storyText").innerText=storyLines[storyIndex++];
-    }else{
+    const lines = [
+        T[lang].s1(player.name),
+        T[lang].s2,
+        T[lang].s3,
+        T[lang].s4
+    ];
+
+    if(storyIndex < lines.length){
+        document.getElementById("storyText").innerText = lines[storyIndex++];
+    } else {
         document.getElementById("storyScreen").classList.add("hidden");
         startGame();
     }
@@ -221,90 +250,93 @@ function startGame(){
 }
 
 function loadRound(){
-    if(currentRound>=requiredRounds){winGame();return;}
-    let round=rounds[currentRound % rounds.length];
-    document.getElementById("weatherDisplay").innerText=round.weather;
-    document.getElementById("questionText").innerText=T[lang].question;
-    let container=document.getElementById("optionsContainer");
-    container.innerHTML="";
+    if(currentRound >= requiredRounds){winGame(); return;}
+    let round = rounds[currentRound % rounds.length];
+    document.getElementById("weatherDisplay").innerText = round.weather;
+    document.getElementById("questionText").innerText = T[lang].question;
+    let container = document.getElementById("optionsContainer");
+    container.innerHTML = "";
     
     let shuffled = [...round.options].sort(()=>Math.random()-0.5);
     shuffled.forEach(opt=>{
-        let btn=document.createElement("button");
-        btn.className="option-btn";
-        btn.innerText=opt;
-        btn.onclick=()=>checkAnswer(opt);
+        let btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(opt);
         container.appendChild(btn);
     });
 }
 
 function checkAnswer(choice){
-    let round=rounds[currentRound % rounds.length];
-    if(choice===round.correct){
+    let round = rounds[currentRound % rounds.length];
+    if(choice === round.correct){
         currentRound++;
-        document.getElementById("feedback").innerText=T[lang].good;
+        document.getElementById("feedback").innerText = T[lang].good;
+        document.getElementById("feedback").style.color = "green";
         moveBalloon();
         setTimeout(() => {
-            document.getElementById("feedback").innerText="";
+            document.getElementById("feedback").innerText = "";
             loadRound();
-        }, 1000);
-    }else{
-        document.getElementById("feedback").innerText=T[lang].tryAgain;
+        }, 1200);
+    } else {
+        document.getElementById("feedback").innerText = T[lang].tryAgain;
+        document.getElementById("feedback").style.color = "red";
         document.getElementById("gameBalloon").classList.add("shake");
-        setTimeout(()=>document.getElementById("gameBalloon").classList.remove("shake"),500);
+        setTimeout(()=>document.getElementById("gameBalloon").classList.remove("shake"), 500);
     }
 }
 
 function moveBalloon(){
-    let balloon=document.getElementById("gameBalloon");
-    // Moves upward as levels progress
-    let height = (currentRound / requiredRounds) * 200; 
-    balloon.style.bottom=`${height}px`;
+    let balloon = document.getElementById("gameBalloon");
+    // Calculate height based on total rounds
+    let step = 250 / requiredRounds;
+    balloon.style.bottom = `${currentRound * step}px`;
 }
 
 function winGame(){
     document.getElementById("gameScreen").classList.add("hidden");
     document.getElementById("winScreen").classList.remove("hidden");
-    document.getElementById("winMessage").innerText=T[lang].win;
+    document.getElementById("winMessage").innerText = T[lang].win;
     launchConfetti();
 }
 
 function launchConfetti(){
-    for(let i=0;i<60;i++){
-        let div=document.createElement("div");
-        div.className="confetti";
-        div.style.left=Math.random()*100+"vw";
-        div.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    for(let i=0; i<60; i++){
+        let div = document.createElement("div");
+        div.className = "confetti";
+        div.style.left = Math.random()*100+"vw";
+        div.style.background = `hsl(${Math.random()*360},100%,50%)`;
         document.body.appendChild(div);
-        setTimeout(()=>div.remove(),3000);
+        setTimeout(()=>div.remove(), 3000);
     }
 }
 
 document.getElementById("gear").onclick=()=>{
-    let pass=prompt("Password:");
-    if(pass==="1234"){
-        let r=prompt("Rounds (3-6):",requiredRounds);
-        requiredRounds=Math.min(6,Math.max(3,parseInt(r)));
-        localStorage.setItem("rounds",requiredRounds);
+    let pass = prompt("Password:");
+    if(pass === "1234"){
+        let r = prompt("Rounds (3-6):", requiredRounds);
+        requiredRounds = Math.min(6, Math.max(3, parseInt(r)));
+        localStorage.setItem("rounds", requiredRounds);
     }
 };
 
 document.getElementById("boy").onclick=function(){
-    player.avatar="👦";
+    player.avatar = "👦";
     this.classList.add("selected");
     document.getElementById("girl").classList.remove("selected");
 };
 document.getElementById("girl").onclick=function(){
-    player.avatar="👧";
+    player.avatar = "👧";
     this.classList.add("selected");
     document.getElementById("boy").classList.remove("selected");
 };
 document.getElementById("startBtn").onclick=()=>{
-    player.name=document.getElementById("playerName").value||"Explorer";
+    player.name = document.getElementById("playerName").value || "Explorer";
     document.getElementById("setupScreen").classList.add("hidden");
-    showStory();
+    document.getElementById("storyScreen").classList.remove("hidden");
+    typeStory();
 };
-document.getElementById("continueBtn").onclick=typeStory;
+document.getElementById("continueBtn").onclick = typeStory;
 
 updateLang();
 </script>

@@ -9,9 +9,9 @@ An interactive web-based game designed for preschool-aged children. The game tea
 - **Vertical Progression**: The balloon moves higher as the child gets closer to winning.
 
 ## 🚀 How to Run
-1. Download the `index.html` file.
-2. Open it in any modern web browser.
-3. Perfect for tablets, touchscreens, or classroom projectors!
+1. Open this link in any modern web browser:
+   https://redfane.github.io/gradinita-poienita-weather-match-game/
+2. Perfect for tablets, touchscreens, or classroom projectors!
 
 ## 🛠 Parent/Teacher Controls
 - Click the **Gear (⚙️)**.

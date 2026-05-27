@@ -1,4 +1,4 @@
-# Gradinita Poieninta , Cluj-Napoca, Romania
+# Poieninta Kindergarden, Cluj-Napoca, Romania
 # Anca Ioana Stan
 # 🎈 Hot Air Balloon Adventure
 
